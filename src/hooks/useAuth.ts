@@ -10,6 +10,19 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
+    const loadProfile = async (userId: string) => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (!mounted) return;
+      setProfile(data);
+      setLoading(false);
+    };
+
     // Set up listener FIRST, then get initial session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -17,18 +30,9 @@ export function useAuth() {
         setUser(session?.user ?? null);
 
         if (session?.user) {
+          setLoading(true);
           // Defer profile fetch to avoid Supabase auth deadlock
-          setTimeout(() => {
-            supabase
-              .from("profiles")
-              .select("*")
-              .eq("user_id", session.user!.id)
-              .maybeSingle()
-              .then(({ data }) => {
-                setProfile(data);
-                setLoading(false);
-              });
-          }, 0);
+          setTimeout(() => loadProfile(session.user!.id), 0);
         } else {
           setProfile(null);
           setLoading(false);
@@ -41,10 +45,13 @@ export function useAuth() {
       if (!session) {
         setLoading(false);
       }
-      // onAuthStateChange will handle the rest
+      // onAuthStateChange will handle profile loading when session exists
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
