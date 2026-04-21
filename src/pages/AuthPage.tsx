@@ -34,21 +34,15 @@ export default function AuthPage() {
     }
 
     if (isLogin) {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast.error(error.message);
         setLoading(false);
         return;
       }
-      const userId = data.user?.id;
-      if (userId) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("user_id", userId)
-          .maybeSingle();
-        navigate(profile ? "/dashboard" : "/onboarding", { replace: true });
-      }
+      // Let RequireProfile decide (dashboard vs onboarding) based on the
+      // profile loaded by AuthContext. Avoids racing with profile fetch.
+      navigate("/dashboard", { replace: true });
     } else {
       const { data, error } = await supabase.auth.signUp({
         email,
