@@ -12,6 +12,7 @@ import {
 import type { Profile, Event } from "@/lib/supabase-helpers";
 import { calculateMatchScore, getMatchBreakdown } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
+import { buildIntroMessage } from "@/lib/intro-message";
 
 export default function SponsorDetailPage() {
   const { id } = useParams();
