@@ -112,7 +112,16 @@ export default function EventDetailPage() {
       .eq("event_id", event.id)
       .eq("sponsor_id", profile.id)
       .single();
-    if (data) navigate(`/messages?conversation=${data.id}`);
+    if (data) {
+      // Auto-send a warm, structured intro message generated from the profile
+      const intro = buildIntroMessage(event, profile, "sponsor");
+      await supabase.from("messages").insert({
+        conversation_id: data.id,
+        sender_id: profile.id,
+        content: intro,
+      });
+      navigate(`/messages?conversation=${data.id}`);
+    }
   };
 
   if (loading) {
