@@ -90,6 +90,15 @@ export default function SponsorDetailPage() {
       setSendingEvent(null);
       return;
     }
+
+    // Auto-send a warm, structured intro message generated from the profile
+    const intro = buildIntroMessage(event, sponsor, "organizer");
+    await supabase.from("messages").insert({
+      conversation_id: created.id,
+      sender_id: profile.id,
+      content: intro,
+    });
+
     setExistingConvs((prev) => ({ ...prev, [event.id]: created.id }));
     navigate(`/messages?conversation=${created.id}`);
   };
