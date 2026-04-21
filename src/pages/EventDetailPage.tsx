@@ -14,6 +14,7 @@ import { es } from "date-fns/locale";
 import type { Event, Profile, ContactRequest } from "@/lib/supabase-helpers";
 import { calculateMatchScore, getMatchBreakdown } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
+import { buildIntroMessage } from "@/lib/intro-message";
 
 const mockPackages = [
   { name: "Gold", benefits: ["Logo en escenario principal", "Stand 6x3m", "10 pases VIP", "Mención en RRSS"] },
