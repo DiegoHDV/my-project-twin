@@ -87,7 +87,7 @@ export default function ProfilePage() {
     if (!profile) return;
     setLoading(true);
 
-    const updates: Record<string, unknown> = {
+    const updates: any = {
       name: name.trim(),
       description: description.trim(),
     };
