@@ -10,6 +10,7 @@ import sponsorManage from "@/assets/preview-sponsor-manage.png";
 import organizerPublish from "@/assets/preview-organizer-publish.png";
 import organizerProposals from "@/assets/preview-organizer-proposals.png";
 import organizerVisibility from "@/assets/preview-organizer-visibility.png";
+import matchScorePreview from "@/assets/preview-match-score.png";
 
 const sponsorPreview = [
   { img: sponsorDiscover, title: "Descubre eventos", desc: "Explora eventos relevantes para tu marca y filtra por categoría o audiencia." },
@@ -192,6 +193,37 @@ export default function Index() {
                 Crear cuenta gratis <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Match Score spotlight */}
+      <section className="py-20 container">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div className="animate-slide-up">
+            <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Match Score</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight">
+              Sabe al instante si una marca y un evento encajan
+            </h2>
+            <p className="mt-4 text-muted-foreground text-lg">
+              Nuestro algoritmo analiza sector, tipo de evento, audiencia y presupuesto para darte
+              un porcentaje de compatibilidad claro — con el desglose detrás de cada número.
+            </p>
+            <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span> Compatibilidad por sector y tipo de evento</li>
+              <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span> Encaje de audiencia y presupuesto</li>
+              <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span> Decisiones más rápidas, contactos más relevantes</li>
+            </ul>
+          </div>
+          <div className="flex justify-center animate-slide-up" style={{ animationDelay: "0.1s", animationFillMode: "both" }}>
+            <div className="bg-card rounded-2xl shadow-card p-4 md:p-6 max-w-md w-full">
+              <img
+                src={matchScorePreview}
+                alt="Desglose del Match Score con compatibilidad por sector, tipo de evento, audiencia y presupuesto"
+                loading="lazy"
+                className="w-full h-auto object-contain"
+              />
+            </div>
           </div>
         </div>
       </section>
