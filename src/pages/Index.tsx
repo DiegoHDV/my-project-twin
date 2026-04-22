@@ -14,7 +14,7 @@ import matchScorePreview from "@/assets/preview-match-score.png";
 
 const sponsorPreview = [
   { img: sponsorDiscover, title: "Descubre eventos", desc: "Explora eventos relevantes para tu marca y filtra por categoría o audiencia." },
-  { img: sponsorConnect, title: "Conecta con organizadores", desc: "Envía propuestas de patrocinio directamente desde la plataforma." },
+  { img: sponsorConnect, title: "Explora eventos en el mapa", desc: "Visualiza eventos por ubicación y descubre oportunidades cerca de ti." },
   { img: sponsorManage, title: "Gestiona tus acuerdos", desc: "Haz seguimiento de tus patrocinios activos y métricas clave." },
 ];
 
