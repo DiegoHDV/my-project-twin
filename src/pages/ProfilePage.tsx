@@ -31,6 +31,7 @@ export default function ProfilePage() {
   const [preferredSectors, setPreferredSectors] = useState(((profile as any)?.preferred_sectors || []).join(", "));
   const [preferredAudiences, setPreferredAudiences] = useState(((profile as any)?.preferred_audiences || []).join(", "));
   const [preferredEventTypes, setPreferredEventTypes] = useState(((profile as any)?.preferred_event_types || []).join(", "));
+  const [location, setLocation] = useState((profile as any)?.location || "");
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -96,6 +97,13 @@ export default function ProfilePage() {
       updates.event_types = eventTypes.split(",").map(s => s.trim()).filter(Boolean);
       updates.social_links = socialLinks.split(",").map(s => s.trim()).filter(Boolean);
     } else {
+      // Validación: ubicación obligatoria para sponsors
+      if (!location.trim()) {
+        toast.error("La ubicación es obligatoria. Ej: Madrid, Comunidad de Madrid, España");
+        setLoading(false);
+        return;
+      }
+      updates.location = location.trim();
       updates.industry = industry.trim();
       updates.tags = tags.split(",").map(s => s.trim()).filter(Boolean);
       updates.budget_min = parseInt(budgetMin) || 0;
