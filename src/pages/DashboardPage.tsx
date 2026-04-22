@@ -412,6 +412,56 @@ export default function DashboardPage() {
                 ))}
               </SelectContent>
             </Select>
+
+            {profile?.role === "sponsor" && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    disabled={!sponsorHasLocation}
+                    title={!sponsorHasLocation ? "Configura tu ubicación en tu perfil para usar este filtro" : undefined}
+                    className="h-10 rounded-lg text-sm gap-1.5 bg-background"
+                  >
+                    <Globe2 className="h-4 w-4" />
+                    Alcance
+                    {reachFilter.length > 0 && (
+                      <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground text-[10px] font-bold">
+                        {reachFilter.length}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-3" align="start">
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Alcance</p>
+                    {REACH_OPTIONS.map((opt) => {
+                      const checked = reachFilter.includes(opt);
+                      return (
+                        <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm py-1">
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(v) => {
+                              setReachFilter((prev) =>
+                                v ? [...prev, opt] : prev.filter((x) => x !== opt)
+                              );
+                            }}
+                          />
+                          {opt}
+                        </label>
+                      );
+                    })}
+                    {reachFilter.length > 0 && (
+                      <button
+                        onClick={() => setReachFilter([])}
+                        className="text-xs text-primary hover:underline mt-1"
+                      >
+                        Limpiar
+                      </button>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
 
           <Select value={sortBy} onValueChange={setSortBy}>
