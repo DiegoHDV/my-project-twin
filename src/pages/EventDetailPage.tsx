@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import type { Event, Profile, ContactRequest } from "@/lib/supabase-helpers";
+import type { Event, Profile } from "@/lib/supabase-helpers";
 import { calculateMatchScore, getMatchBreakdown } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
 import { buildIntroMessage } from "@/lib/intro-message";
@@ -41,7 +41,7 @@ export default function EventDetailPage() {
   const [organizer, setOrganizer] = useState<Profile | null>(null);
   const [confirmedSponsorProfiles, setConfirmedSponsorProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [contactRequest, setContactRequest] = useState<ContactRequest | null>(null);
+  const [existingConversationId, setExistingConversationId] = useState<string | null>(null);
   const [sendingRequest, setSendingRequest] = useState(false);
 
   useEffect(() => {
@@ -50,16 +50,16 @@ export default function EventDetailPage() {
       setEvent(data);
       if (data) {
         const orgPromise = supabase.from("profiles").select("*").eq("id", data.organizer_id).single();
-        const reqPromise = profile?.role === "sponsor"
-          ? supabase.from("contact_requests").select("*").eq("event_id", id).eq("sponsor_id", profile.id).maybeSingle()
+        const convPromise = profile?.role === "sponsor"
+          ? supabase.from("conversations").select("id").eq("event_id", id).eq("sponsor_id", profile.id).maybeSingle()
           : Promise.resolve({ data: null, error: null });
         const sponsorsPromise = (data.confirmed_sponsors && data.confirmed_sponsors.length > 0)
           ? supabase.from("profiles").select("*").in("id", data.confirmed_sponsors)
           : Promise.resolve({ data: null, error: null });
 
-        Promise.all([orgPromise, reqPromise, sponsorsPromise]).then(([orgRes, reqRes, sponsorsRes]) => {
+        Promise.all([orgPromise, convPromise, sponsorsPromise]).then(([orgRes, convRes, sponsorsRes]) => {
           setOrganizer(orgRes.data);
-          setContactRequest((reqRes as any).data || null);
+          setExistingConversationId((convRes as any).data?.id || null);
           if (sponsorsRes?.data) {
             setConfirmedSponsorProfiles(sponsorsRes.data as Profile[]);
           }
@@ -72,57 +72,44 @@ export default function EventDetailPage() {
     });
   }, [id, profile]);
 
-  const handleContactRequest = async () => {
-    if (!event || !profile || !organizer || sendingRequest || contactRequest) return;
-    setSendingRequest(true);
-    const { data, error } = await supabase.from("contact_requests").insert({
-      event_id: event.id,
-      sponsor_id: profile.id,
-      organizer_id: organizer.id,
-      status: "pending",
-    }).select().single();
-    if (error) {
-      toast.error(error.message);
-      setSendingRequest(false);
-    } else {
-      setContactRequest(data as unknown as ContactRequest);
-      toast.success("Solicitud de contacto enviada");
-      // Keep sendingRequest true — the UI will show "Solicitud pendiente" via contactRequest state
-    }
-  };
-
   const handleGoToChat = async () => {
-    if (!profile || !organizer || !event) return;
-    const { data: existing } = await supabase
-      .from("conversations")
-      .select("id")
-      .eq("event_id", event.id)
-      .eq("sponsor_id", profile.id)
-      .maybeSingle();
-    if (existing) {
-      navigate(`/messages?conversation=${existing.id}`);
+    if (!profile || !organizer || !event || sendingRequest) return;
+
+    if (existingConversationId) {
+      navigate(`/messages?conversation=${existingConversationId}`);
       return;
     }
+
+    setSendingRequest(true);
     const { error } = await supabase
       .from("conversations")
       .insert({ event_id: event.id, organizer_id: organizer.id, sponsor_id: profile.id });
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(error.message); setSendingRequest(false); return; }
+
     const { data } = await supabase
       .from("conversations")
       .select("id")
       .eq("event_id", event.id)
       .eq("sponsor_id", profile.id)
-      .single();
-    if (data) {
-      // Auto-send a warm, structured intro message generated from the profile
-      const intro = buildIntroMessage(event, profile, "sponsor");
-      await supabase.from("messages").insert({
-        conversation_id: data.id,
-        sender_id: profile.id,
-        content: intro,
-      });
-      navigate(`/messages?conversation=${data.id}`);
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!data) {
+      toast.error("No se pudo abrir la conversación");
+      setSendingRequest(false);
+      return;
     }
+
+    // Auto-send a warm, structured intro message generated from the profile
+    const intro = buildIntroMessage(event, profile, "sponsor");
+    await supabase.from("messages").insert({
+      conversation_id: data.id,
+      sender_id: profile.id,
+      content: intro,
+    });
+    setExistingConversationId(data.id);
+    navigate(`/messages?conversation=${data.id}`);
   };
 
   if (loading) {
@@ -149,7 +136,6 @@ export default function EventDetailPage() {
   const matchScore = profile?.role === "sponsor" ? calculateMatchScore(event, profile) : null;
   const matchBreakdown = profile?.role === "sponsor" ? getMatchBreakdown(event, profile) : null;
   const confirmedCount = event.confirmed_sponsors?.length || 0;
-  const requestStatus = contactRequest?.status;
 
   const details = [
     { label: "Tipo", value: event.type },
@@ -387,32 +373,21 @@ export default function EventDetailPage() {
                   </div>
                 )}
 
-                {/* Contact button */}
-                {requestStatus === "accepted" ? (
-                  <Button
-                    onClick={handleGoToChat}
-                    className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-lg h-12 text-base"
-                  >
-                    <MessageSquare className="h-4 w-4 mr-2" /> Contactar Organizador
-                  </Button>
-                ) : requestStatus === "pending" ? (
-                  <Button disabled variant="outline" className="w-full rounded-lg h-12 text-base">
-                    <Send className="h-4 w-4 mr-2" /> Solicitud pendiente
-                  </Button>
-                ) : requestStatus === "rejected" ? (
-                  <Button disabled variant="outline" className="w-full rounded-lg h-12 text-base text-destructive">
-                    Solicitud rechazada
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleContactRequest}
-                    disabled={sendingRequest}
-                    className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-lg h-12 text-base"
-                  >
-                    {sendingRequest ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-                    Contactar Organizador
-                  </Button>
-                )}
+                {/* Contact button — directly opens / creates the conversation */}
+                <Button
+                  onClick={handleGoToChat}
+                  disabled={sendingRequest}
+                  className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-lg h-12 text-base"
+                >
+                  {sendingRequest ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : existingConversationId ? (
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Send className="h-4 w-4 mr-2" />
+                  )}
+                  {existingConversationId ? "Ir al chat" : "Contactar Organizador"}
+                </Button>
               </div>
             </div>
           )}
