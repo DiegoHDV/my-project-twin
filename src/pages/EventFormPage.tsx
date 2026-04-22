@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
+import { ALCANCE_OPTIONS, type Alcance } from "@/lib/alcance";
 
 export default function EventFormPage() {
   const { id } = useParams();
