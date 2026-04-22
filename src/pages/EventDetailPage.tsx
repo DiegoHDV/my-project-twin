@@ -15,7 +15,6 @@ import type { Event, Profile } from "@/lib/supabase-helpers";
 import { calculateMatchScore, getMatchBreakdown } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
 import { buildIntroMessage } from "@/lib/intro-message";
-import { ALCANCE_BADGE_CLASS, ALCANCE_ICONS, type Alcance } from "@/lib/alcance";
 
 const mockPackages = [
   { name: "Gold", benefits: ["Logo en escenario principal", "Stand 6x3m", "10 pases VIP", "Mención en RRSS"] },
@@ -142,7 +141,6 @@ export default function EventDetailPage() {
     { label: "Tipo", value: event.type },
     { label: "Sector", value: event.sector },
     { label: "Audiencia", value: event.audience },
-    { label: "Alcance", value: (event as any).alcance || null },
     {
       label: "Rango de patrocinio",
       value: event.sponsorship_min != null && event.sponsorship_max != null
@@ -199,16 +197,6 @@ export default function EventDetailPage() {
                   {event.capacity.toLocaleString()} asistentes
                 </span>
               )}
-              {(event as any).alcance && (() => {
-                const alc = (event as any).alcance as Alcance;
-                const Icon = ALCANCE_ICONS[alc];
-                return (
-                  <span className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-xs font-semibold ${ALCANCE_BADGE_CLASS[alc]}`}>
-                    <Icon className="h-3.5 w-3.5" />
-                    {alc}
-                  </span>
-                );
-              })()}
             </div>
           </div>
         </div>

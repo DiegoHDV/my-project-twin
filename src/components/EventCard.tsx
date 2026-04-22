@@ -9,7 +9,6 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { ALCANCE_BADGE_CLASS, ALCANCE_ICONS, type Alcance } from "@/lib/alcance";
 
 interface EventCardProps {
   event: Event;
@@ -116,27 +115,12 @@ export function EventCard({ event, sponsorProfile, organizer, currentProfileId, 
           </button>
         )}
 
-        {/* Bottom-left: Type + Alcance badges */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-2">
-          {event.type && (
-            <span className="px-3 py-1 rounded-lg bg-card/90 backdrop-blur-sm text-foreground text-xs font-semibold">
-              {event.type}
-            </span>
-          )}
-          {(event as any).alcance && (() => {
-            const alc = (event as any).alcance as Alcance;
-            const Icon = ALCANCE_ICONS[alc];
-            return (
-              <span className={cn(
-                "flex items-center gap-1 px-2.5 py-1 rounded-lg backdrop-blur-sm text-xs font-semibold border",
-                ALCANCE_BADGE_CLASS[alc]
-              )}>
-                <Icon className="h-3 w-3" />
-                {alc}
-              </span>
-            );
-          })()}
-        </div>
+        {/* Bottom-left: Type badge */}
+        {event.type && (
+          <span className="absolute bottom-3 left-3 px-3 py-1 rounded-lg bg-card/90 backdrop-blur-sm text-foreground text-xs font-semibold">
+            {event.type}
+          </span>
+        )}
 
         {/* Draft badge */}
         {!event.published && (
