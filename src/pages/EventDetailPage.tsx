@@ -15,6 +15,7 @@ import type { Event, Profile } from "@/lib/supabase-helpers";
 import { calculateMatchScore, getMatchBreakdown } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
 import { buildIntroMessage } from "@/lib/intro-message";
+import { ALCANCE_BADGE_CLASS, ALCANCE_ICONS, type Alcance } from "@/lib/alcance";
 
 const mockPackages = [
   { name: "Gold", benefits: ["Logo en escenario principal", "Stand 6x3m", "10 pases VIP", "Mención en RRSS"] },
