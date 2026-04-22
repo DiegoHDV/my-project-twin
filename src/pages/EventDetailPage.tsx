@@ -142,6 +142,7 @@ export default function EventDetailPage() {
     { label: "Tipo", value: event.type },
     { label: "Sector", value: event.sector },
     { label: "Audiencia", value: event.audience },
+    { label: "Alcance", value: (event as any).alcance || null },
     {
       label: "Rango de patrocinio",
       value: event.sponsorship_min != null && event.sponsorship_max != null
