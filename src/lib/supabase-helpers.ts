@@ -117,46 +117,52 @@ export function getMatchBreakdown(event: Event, sponsor: Profile, perspective: "
   const items: MatchBreakdownItem[] = [];
   const isOrganizer = perspective === "organizer";
 
-  // Helper for list-based matches (sector, type, audience): exact = high, partial substring = medium, none = low
-  const classifyList = (eventValue: string, list: string[]): MatchLevel => {
+  // Classify single value vs list of preferences:
+  //  - high: exact match
+  //  - medium: partial match (substring in either direction)
+  //  - low: no match at all
+  const classifyList = (eventValue: string, list: string[]): { level: MatchLevel; matched: string[]; unmatched: string[] } => {
     const ev = eventValue.toLowerCase();
-    const exact = list.some(x => x.toLowerCase() === ev);
-    if (exact) return "high";
-    const partial = list.some(x => {
+    const matched: string[] = [];
+    const unmatched: string[] = [];
+    let exact = false;
+    for (const x of list) {
       const xl = x.toLowerCase();
-      return ev.includes(xl) || xl.includes(ev);
-    });
-    return partial ? "medium" : "low";
+      if (xl === ev) { exact = true; matched.push(x); }
+      else if (ev.includes(xl) || xl.includes(ev)) matched.push(x);
+      else unmatched.push(x);
+    }
+    if (exact) return { level: "high", matched, unmatched };
+    if (matched.length > 0) return { level: "medium", matched, unmatched };
+    return { level: "low", matched, unmatched };
   };
 
   // Sector
   const preferredSectors = (sponsor as any).preferred_sectors as string[] | null;
   if (preferredSectors && preferredSectors.length > 0 && event.sector) {
-    const level = classifyList(event.sector, preferredSectors);
-    const reasonHigh = isOrganizer
-      ? `Tu evento es del sector "${event.sector}" y coincide con las preferencias del sponsor: ${preferredSectors.join(", ")}`
-      : `El sector "${event.sector}" coincide con tus preferencias: ${preferredSectors.join(", ")}`;
-    const reasonMid = isOrganizer
-      ? `El sector "${event.sector}" tiene cierta afinidad con las preferencias del sponsor: ${preferredSectors.join(", ")}`
-      : `El sector "${event.sector}" tiene cierta afinidad con tus preferencias: ${preferredSectors.join(", ")}`;
-    const reasonLow = isOrganizer
-      ? `Tu evento es del sector "${event.sector}" pero las preferencias del sponsor son: ${preferredSectors.join(", ")}`
-      : `El sector del evento es "${event.sector}" pero tus preferencias son: ${preferredSectors.join(", ")}`;
-    items.push(makeItem("Sector", level, level === "high" ? reasonHigh : level === "medium" ? reasonMid : reasonLow));
+    const { level, unmatched } = classifyList(event.sector, preferredSectors);
+    const reason = level === "high"
+      ? (isOrganizer
+          ? `Tu sector "${event.sector}" coincide con las preferencias del sponsor: ${preferredSectors.join(", ")}`
+          : `El sector "${event.sector}" coincide con tus preferencias: ${preferredSectors.join(", ")}`)
+      : level === "medium"
+      ? (isOrganizer
+          ? `Coincide parcialmente. Las preferencias del sponsor que no se cubren son: ${unmatched.join(", ") || "ninguna"}`
+          : `Coincide parcialmente. Tus preferencias que no se cubren son: ${unmatched.join(", ") || "ninguna"}`)
+      : (isOrganizer
+          ? `El sector "${event.sector}" no está entre las preferencias del sponsor: ${preferredSectors.join(", ")}`
+          : `El sector "${event.sector}" no está entre tus preferencias: ${preferredSectors.join(", ")}`);
+    items.push(makeItem("Sector", level, reason));
   } else if (event.sector && sponsor.industry) {
     const evL = event.sector.toLowerCase();
     const inL = sponsor.industry.toLowerCase();
     const level: MatchLevel = evL === inL ? "high" : (evL.includes(inL) || inL.includes(evL)) ? "medium" : "low";
-    const reasonHigh = isOrganizer
-      ? `Tu evento es del sector "${event.sector}" y coincide con la industria del sponsor "${sponsor.industry}"`
-      : `Tu industria "${sponsor.industry}" coincide con el sector del evento`;
-    const reasonMid = isOrganizer
-      ? `El sector "${event.sector}" tiene cierta afinidad con la industria del sponsor "${sponsor.industry}"`
-      : `Tu industria "${sponsor.industry}" tiene cierta afinidad con el sector "${event.sector}"`;
-    const reasonLow = isOrganizer
-      ? `Tu evento es del sector "${event.sector}" pero la industria del sponsor es "${sponsor.industry}"`
-      : `El sector del evento es "${event.sector}" pero tu industria es "${sponsor.industry}"`;
-    items.push(makeItem("Sector", level, level === "high" ? reasonHigh : level === "medium" ? reasonMid : reasonLow));
+    const reason = level === "high"
+      ? (isOrganizer ? `Tu sector "${event.sector}" coincide con la industria del sponsor "${sponsor.industry}"` : `Tu industria "${sponsor.industry}" coincide con el sector del evento`)
+      : level === "medium"
+      ? `Hay afinidad parcial entre el sector "${event.sector}" y la industria "${sponsor.industry}", pero no es exacta`
+      : (isOrganizer ? `Tu sector "${event.sector}" no coincide con la industria del sponsor "${sponsor.industry}"` : `El sector "${event.sector}" no coincide con tu industria "${sponsor.industry}"`);
+    items.push(makeItem("Sector", level, reason));
   } else {
     items.push(makeItem("Sector", "low", !event.sector
       ? "El evento no tiene sector definido"
@@ -168,17 +174,19 @@ export function getMatchBreakdown(event: Event, sponsor: Profile, perspective: "
   // Event type
   const preferredTypes = (sponsor as any).preferred_event_types as string[] | null;
   if (preferredTypes && preferredTypes.length > 0 && event.type) {
-    const level = classifyList(event.type, preferredTypes);
-    const reasonHigh = isOrganizer
-      ? `Tu evento es de tipo "${event.type}" y coincide con las preferencias del sponsor: ${preferredTypes.join(", ")}`
-      : `El tipo "${event.type}" coincide con tus preferencias: ${preferredTypes.join(", ")}`;
-    const reasonMid = isOrganizer
-      ? `El tipo "${event.type}" tiene cierta afinidad con las preferencias del sponsor: ${preferredTypes.join(", ")}`
-      : `El tipo "${event.type}" tiene cierta afinidad con tus preferencias: ${preferredTypes.join(", ")}`;
-    const reasonLow = isOrganizer
-      ? `Tu evento es de tipo "${event.type}" pero las preferencias del sponsor son: ${preferredTypes.join(", ")}`
-      : `El tipo del evento es "${event.type}" pero tus preferencias son: ${preferredTypes.join(", ")}`;
-    items.push(makeItem("Tipo de evento", level, level === "high" ? reasonHigh : level === "medium" ? reasonMid : reasonLow));
+    const { level, unmatched } = classifyList(event.type, preferredTypes);
+    const reason = level === "high"
+      ? (isOrganizer
+          ? `Tu tipo "${event.type}" coincide con las preferencias del sponsor: ${preferredTypes.join(", ")}`
+          : `El tipo "${event.type}" coincide con tus preferencias: ${preferredTypes.join(", ")}`)
+      : level === "medium"
+      ? (isOrganizer
+          ? `Coincide parcialmente. Las preferencias del sponsor que no se cubren son: ${unmatched.join(", ") || "ninguna"}`
+          : `Coincide parcialmente. Tus preferencias que no se cubren son: ${unmatched.join(", ") || "ninguna"}`)
+      : (isOrganizer
+          ? `El tipo "${event.type}" no está entre las preferencias del sponsor: ${preferredTypes.join(", ")}`
+          : `El tipo "${event.type}" no está entre tus preferencias: ${preferredTypes.join(", ")}`);
+    items.push(makeItem("Tipo de evento", level, reason));
   } else {
     items.push(makeItem("Tipo de evento", "low", !event.type
       ? "El evento no tiene tipo definido"
@@ -190,17 +198,19 @@ export function getMatchBreakdown(event: Event, sponsor: Profile, perspective: "
   // Audience
   const preferredAudiences = (sponsor as any).preferred_audiences as string[] | null;
   if (preferredAudiences && preferredAudiences.length > 0 && event.audience) {
-    const level = classifyList(event.audience, preferredAudiences);
-    const reasonHigh = isOrganizer
-      ? `Tu evento tiene audiencia "${event.audience}" y encaja con las preferencias del sponsor: ${preferredAudiences.join(", ")}`
-      : `La audiencia "${event.audience}" encaja con tus preferencias: ${preferredAudiences.join(", ")}`;
-    const reasonMid = isOrganizer
-      ? `La audiencia "${event.audience}" tiene cierta afinidad con las preferencias del sponsor: ${preferredAudiences.join(", ")}`
-      : `La audiencia "${event.audience}" tiene cierta afinidad con tus preferencias: ${preferredAudiences.join(", ")}`;
-    const reasonLow = isOrganizer
-      ? `Tu evento tiene audiencia "${event.audience}" pero las preferencias del sponsor son: ${preferredAudiences.join(", ")}`
-      : `La audiencia del evento es "${event.audience}" pero tus preferencias son: ${preferredAudiences.join(", ")}`;
-    items.push(makeItem("Audiencia", level, level === "high" ? reasonHigh : level === "medium" ? reasonMid : reasonLow));
+    const { level, unmatched } = classifyList(event.audience, preferredAudiences);
+    const reason = level === "high"
+      ? (isOrganizer
+          ? `Tu audiencia "${event.audience}" encaja con las preferencias del sponsor: ${preferredAudiences.join(", ")}`
+          : `La audiencia "${event.audience}" encaja con tus preferencias: ${preferredAudiences.join(", ")}`)
+      : level === "medium"
+      ? (isOrganizer
+          ? `Coincide parcialmente. Las preferencias del sponsor que no se cubren son: ${unmatched.join(", ") || "ninguna"}`
+          : `Coincide parcialmente. Tus preferencias que no se cubren son: ${unmatched.join(", ") || "ninguna"}`)
+      : (isOrganizer
+          ? `La audiencia "${event.audience}" no está entre las preferencias del sponsor: ${preferredAudiences.join(", ")}`
+          : `La audiencia "${event.audience}" no está entre tus preferencias: ${preferredAudiences.join(", ")}`);
+    items.push(makeItem("Audiencia", level, reason));
   } else {
     items.push(makeItem("Audiencia", "low", !event.audience
       ? "El evento no tiene audiencia definida"
@@ -209,33 +219,42 @@ export function getMatchBreakdown(event: Event, sponsor: Profile, perspective: "
         : "No tienes audiencias preferidas configuradas"));
   }
 
-  // Budget: high = solape ≥ 50% del rango más pequeño, medium = solape > 0, low = sin solape
+  // Budget:
+  //  - high: el rango del evento está totalmente dentro del rango del sponsor (cubre toda la necesidad)
+  //  - medium: solape parcial (especifica la parte fuera)
+  //  - low: sin solape
   if (
     sponsor.budget_min != null && sponsor.budget_max != null &&
     event.sponsorship_min != null && event.sponsorship_max != null
   ) {
-    const overlap = Math.max(
-      0,
-      Math.min(sponsor.budget_max, event.sponsorship_max) -
-        Math.max(sponsor.budget_min, event.sponsorship_min)
-    );
-    const sponsorRange = Math.max(1, sponsor.budget_max - sponsor.budget_min);
-    const eventRange = Math.max(1, event.sponsorship_max - event.sponsorship_min);
-    const smallerRange = Math.min(sponsorRange, eventRange);
-    const ratio = overlap / smallerRange;
-    const level: MatchLevel = overlap <= 0 ? "low" : ratio >= 0.5 ? "high" : "medium";
-    const sponsorRangeStr = `$${sponsor.budget_min.toLocaleString()} - $${sponsor.budget_max.toLocaleString()}`;
-    const eventRangeStr = `$${event.sponsorship_min.toLocaleString()} - $${event.sponsorship_max.toLocaleString()}`;
-    const reasonHigh = isOrganizer
-      ? `Tu rango de patrocinio (${eventRangeStr}) se solapa ampliamente con el presupuesto del sponsor (${sponsorRangeStr})`
-      : `Tu rango (${sponsorRangeStr}) se solapa ampliamente con el del evento (${eventRangeStr})`;
-    const reasonMid = isOrganizer
-      ? `Tu rango de patrocinio (${eventRangeStr}) se solapa parcialmente con el presupuesto del sponsor (${sponsorRangeStr})`
-      : `Tu rango (${sponsorRangeStr}) se solapa parcialmente con el del evento (${eventRangeStr})`;
-    const reasonLow = isOrganizer
-      ? `Tu rango de patrocinio (${eventRangeStr}) no se solapa con el presupuesto del sponsor (${sponsorRangeStr})`
-      : `Tu rango (${sponsorRangeStr}) no se solapa con el del evento (${eventRangeStr})`;
-    items.push(makeItem("Presupuesto", level, level === "high" ? reasonHigh : level === "medium" ? reasonMid : reasonLow));
+    const sMin = sponsor.budget_min, sMax = sponsor.budget_max;
+    const eMin = event.sponsorship_min, eMax = event.sponsorship_max;
+    const overlap = Math.max(0, Math.min(sMax, eMax) - Math.max(sMin, eMin));
+    const eventInsideSponsor = eMin >= sMin && eMax <= sMax;
+    const level: MatchLevel = overlap <= 0 ? "low" : eventInsideSponsor ? "high" : "medium";
+    const sponsorRangeStr = `$${sMin.toLocaleString()} - $${sMax.toLocaleString()}`;
+    const eventRangeStr = `$${eMin.toLocaleString()} - $${eMax.toLocaleString()}`;
+
+    let outsideDetail = "";
+    if (level === "medium") {
+      const parts: string[] = [];
+      if (eMin < sMin) parts.push(`la franja $${eMin.toLocaleString()} - $${Math.min(sMin, eMax).toLocaleString()} queda por debajo del presupuesto del sponsor`);
+      if (eMax > sMax) parts.push(`la franja $${Math.max(sMax, eMin).toLocaleString()} - $${eMax.toLocaleString()} queda por encima del presupuesto del sponsor`);
+      outsideDetail = parts.join("; ");
+    }
+
+    const reason = level === "high"
+      ? (isOrganizer
+          ? `Tu rango de patrocinio (${eventRangeStr}) está dentro del presupuesto del sponsor (${sponsorRangeStr})`
+          : `El rango del evento (${eventRangeStr}) cabe dentro de tu presupuesto (${sponsorRangeStr})`)
+      : level === "medium"
+      ? (isOrganizer
+          ? `Solapa parcialmente con el presupuesto del sponsor (${sponsorRangeStr}): ${outsideDetail}`
+          : `Tu presupuesto (${sponsorRangeStr}) solapa parcialmente con el del evento (${eventRangeStr}): ${outsideDetail}`)
+      : (isOrganizer
+          ? `Tu rango (${eventRangeStr}) no se solapa con el presupuesto del sponsor (${sponsorRangeStr})`
+          : `Tu presupuesto (${sponsorRangeStr}) no se solapa con el del evento (${eventRangeStr})`);
+    items.push(makeItem("Presupuesto", level, reason));
   } else {
     items.push(makeItem("Presupuesto", "low", isOrganizer
       ? (event.sponsorship_min == null || event.sponsorship_max == null)
