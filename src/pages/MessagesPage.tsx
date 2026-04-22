@@ -105,30 +105,8 @@ export default function MessagesPage() {
   };
 
   const fetchPendingRequests = async () => {
-    if (!profile) return;
-    const isOrganizer = profile.role === "organizer";
-    const column = isOrganizer ? "organizer_id" : "sponsor_id";
-
-    const { data } = await supabase
-      .from("contact_requests")
-      .select("*")
-      .eq(column, profile.id)
-      .eq("status", "pending")
-      .order("created_at", { ascending: false });
-
-    if (!data) return;
-
-    const enriched: RequestWithDetails[] = await Promise.all(
-      (data as any[]).map(async (req) => {
-        const otherProfileId = isOrganizer ? req.sponsor_id : req.organizer_id;
-        const [userRes, eventRes] = await Promise.all([
-          supabase.from("profiles").select("*").eq("id", otherProfileId).single(),
-          supabase.from("events").select("*").eq("id", req.event_id).single(),
-        ]);
-        return { ...req, otherUser: userRes.data || undefined, event: eventRes.data || undefined };
-      })
-    );
-    setPendingRequests(enriched);
+    // Contact requests flow has been removed — sponsors now start conversations directly.
+    setPendingRequests([]);
   };
 
   const fetchMessages = async (convId: string) => {
