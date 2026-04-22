@@ -81,17 +81,26 @@ export function calculateMatchScore(
     event.sponsorship_min != null &&
     event.sponsorship_max != null
   ) {
-    const budgetOverlap = Math.max(
-      0,
-      Math.min(sponsor.budget_max, event.sponsorship_max) -
-        Math.max(sponsor.budget_min, event.sponsorship_min)
-    );
-    const maxRange = Math.max(
-      event.sponsorship_max - event.sponsorship_min,
-      sponsor.budget_max - sponsor.budget_min,
-      1
-    );
-    const budgetScore = Math.min(budgetOverlap / maxRange, 1);
+    const eventInsideSponsor =
+      event.sponsorship_min >= sponsor.budget_min &&
+      event.sponsorship_max <= sponsor.budget_max;
+    let budgetScore: number;
+    if (eventInsideSponsor) {
+      // Sponsor budget fully covers the event range → 100%
+      budgetScore = 1;
+    } else {
+      const budgetOverlap = Math.max(
+        0,
+        Math.min(sponsor.budget_max, event.sponsorship_max) -
+          Math.max(sponsor.budget_min, event.sponsorship_min)
+      );
+      const maxRange = Math.max(
+        event.sponsorship_max - event.sponsorship_min,
+        sponsor.budget_max - sponsor.budget_min,
+        1
+      );
+      budgetScore = Math.min(budgetOverlap / maxRange, 1);
+    }
     score += budgetScore * 25;
     weights += 25;
   }
