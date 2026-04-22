@@ -198,6 +198,16 @@ export default function EventDetailPage() {
                   {event.capacity.toLocaleString()} asistentes
                 </span>
               )}
+              {(event as any).alcance && (() => {
+                const alc = (event as any).alcance as Alcance;
+                const Icon = ALCANCE_ICONS[alc];
+                return (
+                  <span className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-xs font-semibold ${ALCANCE_BADGE_CLASS[alc]}`}>
+                    <Icon className="h-3.5 w-3.5" />
+                    {alc}
+                  </span>
+                );
+              })()}
             </div>
           </div>
         </div>
