@@ -187,6 +187,24 @@ export function computeReach(
 
 export const REACH_OPTIONS: Reach[] = ["Local", "Regional", "Nacional", "Internacional"];
 
+// Jerarquía inclusiva: cada nivel "incluye" los inferiores.
+// Internacional (4) incluye Nacional (3), Regional (2) y Local (1).
+const REACH_RANK: Record<Reach, number> = {
+  Local: 1,
+  Regional: 2,
+  Nacional: 3,
+  Internacional: 4,
+};
+
+/**
+ * ¿El alcance del evento (`eventReach`) entra dentro del filtro `selected` de forma inclusiva?
+ * Internacional ⊇ Nacional ⊇ Regional ⊇ Local.
+ */
+export function reachMatchesFilter(eventReach: Reach | null, selected: Reach): boolean {
+  if (!eventReach) return false;
+  return REACH_RANK[eventReach] <= REACH_RANK[selected];
+}
+
 export const REACH_BADGE_CLASSES: Record<Reach, string> = {
   Local: "bg-blue-500/15 text-blue-600 border-blue-500/30 dark:text-blue-400",
   Regional: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400",

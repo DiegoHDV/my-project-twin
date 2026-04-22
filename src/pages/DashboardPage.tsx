@@ -16,7 +16,7 @@ import type { Event, Profile } from "@/lib/supabase-helpers";
 import { calculateMatchScore } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
 import { toast } from "sonner";
-import { computeReach, REACH_OPTIONS, type Reach } from "@/lib/reach";
+import { computeReach, REACH_OPTIONS, reachMatchesFilter, type Reach } from "@/lib/reach";
 
 const CATEGORY_OPTIONS = [
   { label: "Categoría", value: "all" },
@@ -78,7 +78,7 @@ export default function DashboardPage() {
   const [budgetFilter, setBudgetFilter] = useState("all");
   const [sortBy, setSortBy] = useState<string>("match");
 
-  const [reachFilter, setReachFilter] = useState<Reach[]>([]);
+  const [reachFilter, setReachFilter] = useState<Reach | "all">("all");
 
   const [locations, setLocations] = useState<string[]>([]);
 
@@ -178,9 +178,9 @@ export default function DashboardPage() {
       const max = parseInt(budgetFilter);
       if ((e.sponsorship_max ?? 0) >= max) return false;
     }
-    if (reachFilter.length > 0 && sponsorHasLocation) {
+    if (reachFilter !== "all" && sponsorHasLocation) {
       const r = computeReach(e.location, sponsorLocation);
-      if (!r || !reachFilter.includes(r)) return false;
+      if (!reachMatchesFilter(r, reachFilter)) return false;
     }
     return true;
   });
