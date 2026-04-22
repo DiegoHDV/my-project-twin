@@ -5,7 +5,9 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { EventCard } from "@/components/EventCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarDays, ChevronLeft, ChevronRight, Sparkles, MapPin, TrendingUp, Bookmark } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CalendarDays, ChevronLeft, ChevronRight, Sparkles, MapPin, TrendingUp, Bookmark, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -13,6 +15,7 @@ import type { Event, Profile } from "@/lib/supabase-helpers";
 import { calculateMatchScore } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
 import { toast } from "sonner";
+import { ALCANCE_OPTIONS, type Alcance } from "@/lib/alcance";
 
 const CATEGORY_OPTIONS = [
   { label: "Categoría", value: "all" },
@@ -73,6 +76,7 @@ export default function DashboardPage() {
   const [audienceFilter, setAudienceFilter] = useState("all");
   const [budgetFilter, setBudgetFilter] = useState("all");
   const [sortBy, setSortBy] = useState<string>("match");
+  const [alcanceFilter, setAlcanceFilter] = useState<Alcance[]>([]);
 
   const [locations, setLocations] = useState<string[]>([]);
 
@@ -168,6 +172,10 @@ export default function DashboardPage() {
     if (budgetFilter !== "all") {
       const max = parseInt(budgetFilter);
       if ((e.sponsorship_max ?? 0) >= max) return false;
+    }
+    if (alcanceFilter.length > 0) {
+      const a = (e as any).alcance as Alcance | null | undefined;
+      if (!a || !alcanceFilter.includes(a)) return false;
     }
     return true;
   });
@@ -399,6 +407,59 @@ export default function DashboardPage() {
                 ))}
               </SelectContent>
             </Select>
+
+            {profile?.role === "sponsor" && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 h-10 px-3 rounded-lg bg-background border border-border text-sm hover:bg-muted transition-colors"
+                  >
+                    <span>
+                      Alcance
+                      {alcanceFilter.length > 0 && (
+                        <span className="ml-1.5 px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold">
+                          {alcanceFilter.length}
+                        </span>
+                      )}
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-52 p-2">
+                  <div className="space-y-1">
+                    {ALCANCE_OPTIONS.map((opt) => {
+                      const checked = alcanceFilter.includes(opt);
+                      return (
+                        <label
+                          key={opt}
+                          className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer text-sm"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(v) => {
+                              setAlcanceFilter((prev) =>
+                                v ? [...prev, opt] : prev.filter((x) => x !== opt)
+                              );
+                            }}
+                          />
+                          {opt}
+                        </label>
+                      );
+                    })}
+                    {alcanceFilter.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setAlcanceFilter([])}
+                        className="w-full text-left px-2 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-muted"
+                      >
+                        Limpiar selección
+                      </button>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
 
           <Select value={sortBy} onValueChange={setSortBy}>

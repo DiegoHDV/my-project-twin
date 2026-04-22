@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
+import { ALCANCE_OPTIONS, type Alcance } from "@/lib/alcance";
 
 export default function EventFormPage() {
   const { id } = useParams();
@@ -32,6 +34,8 @@ export default function EventFormPage() {
   const [published, setPublished] = useState(false);
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [alcance, setAlcance] = useState<Alcance | "">("");
+  const [alcanceError, setAlcanceError] = useState(false);
 
   useEffect(() => {
     if (isEditing && id) {
@@ -55,6 +59,7 @@ export default function EventFormPage() {
             setPublished(data.published || false);
             setLatitude((data as any).latitude?.toString() || "");
             setLongitude((data as any).longitude?.toString() || "");
+            setAlcance(((data as any).alcance as Alcance) || "");
           }
         });
     }
@@ -63,6 +68,11 @@ export default function EventFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
+    if (!alcance) {
+      setAlcanceError(true);
+      toast.error("Debes seleccionar un alcance para el evento");
+      return;
+    }
     setLoading(true);
 
     const eventData = {
@@ -80,7 +90,8 @@ export default function EventFormPage() {
       published,
       latitude: latitude ? parseFloat(latitude) : null,
       longitude: longitude ? parseFloat(longitude) : null,
-    };
+      alcance,
+    } as any;
 
     if (isEditing && id) {
       const { error } = await supabase.from("events").update(eventData).eq("id", id);
@@ -188,6 +199,28 @@ export default function EventFormPage() {
                 <Label>Sponsorship máx (USD)</Label>
                 <Input type="number" value={sponsorshipMax} onChange={(e) => setSponsorshipMax(e.target.value)} placeholder="50000" />
               </div>
+            </div>
+
+            <div>
+              <Label>
+                Alcance <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={alcance}
+                onValueChange={(v) => { setAlcance(v as Alcance); setAlcanceError(false); }}
+              >
+                <SelectTrigger className={alcanceError ? "border-destructive" : ""}>
+                  <SelectValue placeholder="Selecciona el alcance del evento" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ALCANCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {alcanceError && (
+                <p className="text-xs text-destructive mt-1">El alcance es obligatorio</p>
+              )}
             </div>
 
             <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50">
