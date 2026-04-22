@@ -117,6 +117,7 @@ export type Database = {
       }
       events: {
         Row: {
+          alcance: Database["public"]["Enums"]["event_scope"] | null
           audience: string | null
           capacity: number | null
           confirmed_sponsors: string[] | null
@@ -138,6 +139,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alcance?: Database["public"]["Enums"]["event_scope"] | null
           audience?: string | null
           capacity?: number | null
           confirmed_sponsors?: string[] | null
@@ -159,6 +161,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alcance?: Database["public"]["Enums"]["event_scope"] | null
           audience?: string | null
           capacity?: number | null
           confirmed_sponsors?: string[] | null
@@ -396,6 +399,7 @@ export type Database = {
     Enums: {
       app_role: "organizer" | "sponsor"
       contact_request_status: "pending" | "accepted" | "rejected"
+      event_scope: "Local" | "Regional" | "Nacional" | "Internacional"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -525,6 +529,7 @@ export const Constants = {
     Enums: {
       app_role: ["organizer", "sponsor"],
       contact_request_status: ["pending", "accepted", "rejected"],
+      event_scope: ["Local", "Regional", "Nacional", "Internacional"],
     },
   },
 } as const
