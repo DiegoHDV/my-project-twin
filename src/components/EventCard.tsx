@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { computeReach, REACH_BADGE_CLASSES } from "@/lib/reach";
 
 interface EventCardProps {
   event: Event;
@@ -26,6 +27,7 @@ export function EventCard({ event, sponsorProfile, organizer, currentProfileId, 
 
   const matchScore = sponsorProfile ? calculateMatchScore(event, sponsorProfile) : null;
   const isStrongMatch = matchScore !== null && matchScore >= 80;
+  const reach = sponsorProfile ? computeReach(event.location, (sponsorProfile as any).location) : null;
 
   useEffect(() => {
     if (!currentProfileId) return;
