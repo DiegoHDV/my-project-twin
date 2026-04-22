@@ -5,7 +5,10 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { EventCard } from "@/components/EventCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarDays, ChevronLeft, ChevronRight, Sparkles, MapPin, TrendingUp, Bookmark } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, ChevronLeft, ChevronRight, Sparkles, MapPin, TrendingUp, Bookmark, Globe2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -13,6 +16,7 @@ import type { Event, Profile } from "@/lib/supabase-helpers";
 import { calculateMatchScore } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
 import { toast } from "sonner";
+import { computeReach, REACH_OPTIONS, type Reach } from "@/lib/reach";
 
 const CATEGORY_OPTIONS = [
   { label: "Categoría", value: "all" },
