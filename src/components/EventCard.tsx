@@ -102,7 +102,7 @@ export function EventCard({ event, sponsorProfile, organizer, currentProfileId, 
               </span>
             )}
             {reach && (
-              <span className={cn("px-2.5 py-1 rounded-lg backdrop-blur-sm text-xs font-bold border", REACH_BADGE_CLASSES[reach])}>
+              <span className={cn("px-2.5 py-1 rounded-lg text-xs font-bold border shadow-sm", REACH_BADGE_CLASSES[reach])}>
                 {reach}
               </span>
             )}
