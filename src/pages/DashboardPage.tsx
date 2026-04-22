@@ -78,7 +78,12 @@ export default function DashboardPage() {
   const [budgetFilter, setBudgetFilter] = useState("all");
   const [sortBy, setSortBy] = useState<string>("match");
 
+  const [reachFilter, setReachFilter] = useState<Reach[]>([]);
+
   const [locations, setLocations] = useState<string[]>([]);
+
+  const sponsorLocation = (profile as any)?.location as string | null | undefined;
+  const sponsorHasLocation = !!sponsorLocation && profile?.role === "sponsor";
 
   // Carousel
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -172,6 +177,10 @@ export default function DashboardPage() {
     if (budgetFilter !== "all") {
       const max = parseInt(budgetFilter);
       if ((e.sponsorship_max ?? 0) >= max) return false;
+    }
+    if (reachFilter.length > 0 && sponsorHasLocation) {
+      const r = computeReach(e.location, sponsorLocation);
+      if (!r || !reachFilter.includes(r)) return false;
     }
     return true;
   });
