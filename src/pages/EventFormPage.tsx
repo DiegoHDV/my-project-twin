@@ -34,6 +34,8 @@ export default function EventFormPage() {
   const [published, setPublished] = useState(false);
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [alcance, setAlcance] = useState<Alcance | "">("");
+  const [alcanceError, setAlcanceError] = useState(false);
 
   useEffect(() => {
     if (isEditing && id) {
@@ -57,6 +59,7 @@ export default function EventFormPage() {
             setPublished(data.published || false);
             setLatitude((data as any).latitude?.toString() || "");
             setLongitude((data as any).longitude?.toString() || "");
+            setAlcance(((data as any).alcance as Alcance) || "");
           }
         });
     }
@@ -65,6 +68,11 @@ export default function EventFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
+    if (!alcance) {
+      setAlcanceError(true);
+      toast.error("Debes seleccionar un alcance para el evento");
+      return;
+    }
     setLoading(true);
 
     const eventData = {
@@ -82,7 +90,8 @@ export default function EventFormPage() {
       published,
       latitude: latitude ? parseFloat(latitude) : null,
       longitude: longitude ? parseFloat(longitude) : null,
-    };
+      alcance,
+    } as any;
 
     if (isEditing && id) {
       const { error } = await supabase.from("events").update(eventData).eq("id", id);
