@@ -18,7 +18,7 @@ const sponsorPreview = [
 ];
 
 const organizerPreview = [
-  { img: organizerPublish, title: "Publica tu evento", desc: "Crea tu ficha de evento con todos los detalles para atraer sponsors." },
+  { img: organizerPublish, title: "Busca sponsors para tu evento", desc: "Explora marcas compatibles y descubre sponsors ideales según el match score con tu evento." },
   { img: organizerProposals, title: "Recibe propuestas", desc: "Revisa y responde a solicitudes de patrocinio en un solo lugar." },
   { img: organizerVisibility, title: "Controla tu visibilidad", desc: "Ve cómo aparece tu evento ante los sponsors potenciales." },
 ];
