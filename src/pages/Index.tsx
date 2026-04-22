@@ -29,14 +29,23 @@ function PreviewCards({ items }: { items: typeof sponsorPreview }) {
       {items.map((it, i) => (
         <div
           key={it.title}
-          className="bg-card rounded-2xl p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 animate-slide-up flex flex-col items-center text-center"
+          className="bg-card rounded-2xl overflow-hidden shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 animate-slide-up flex flex-col"
           style={{ animationDelay: `${0.08 * i}s`, animationFillMode: "both" }}
         >
-          <div className="h-36 w-36 mb-4 flex items-center justify-center bg-muted/40 rounded-2xl">
-            <img src={it.img} alt={it.title} loading="lazy" width={512} height={512} className="h-32 w-32 object-contain" />
+          <div className="aspect-[16/10] bg-muted/40 overflow-hidden border-b border-border">
+            <img
+              src={it.img}
+              alt={it.title}
+              loading="lazy"
+              width={1280}
+              height={800}
+              className="w-full h-full object-cover object-top"
+            />
           </div>
-          <h3 className="font-semibold text-base mb-1">{it.title}</h3>
-          <p className="text-sm text-muted-foreground">{it.desc}</p>
+          <div className="p-6">
+            <h3 className="font-semibold text-base mb-1">{it.title}</h3>
+            <p className="text-sm text-muted-foreground">{it.desc}</p>
+          </div>
         </div>
       ))}
     </div>
