@@ -153,6 +153,40 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Preview by role */}
+      <section className="py-20 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-10 animate-fade-in">
+            <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Vista previa</p>
+            <h2 className="text-3xl md:text-4xl font-bold">Esto es lo que encontrarás dentro</h2>
+            <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+              Una experiencia diseñada para cada rol. Elige el tuyo y descubre cómo funciona.
+            </p>
+          </div>
+
+          <Tabs defaultValue="sponsor" className="w-full">
+            <TabsList className="mx-auto flex w-full max-w-md rounded-full bg-card p-1 h-12">
+              <TabsTrigger value="sponsor" className="flex-1 rounded-full h-10 data-[state=active]:gradient-primary data-[state=active]:text-white">
+                Soy Sponsor
+              </TabsTrigger>
+              <TabsTrigger value="organizer" className="flex-1 rounded-full h-10 data-[state=active]:gradient-primary data-[state=active]:text-white">
+                Soy Organizador
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="sponsor"><PreviewCards items={sponsorPreview} /></TabsContent>
+            <TabsContent value="organizer"><PreviewCards items={organizerPreview} /></TabsContent>
+          </Tabs>
+
+          <div className="mt-12 text-center">
+            <Link to="/auth?mode=signup">
+              <Button size="lg" className="gradient-primary text-white border-0 rounded-full h-12 px-8 font-semibold">
+                Crear cuenta gratis <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20">
         <div className="container">
