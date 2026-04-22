@@ -407,6 +407,59 @@ export default function DashboardPage() {
                 ))}
               </SelectContent>
             </Select>
+
+            {profile?.role === "sponsor" && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 h-10 px-3 rounded-lg bg-background border border-border text-sm hover:bg-muted transition-colors"
+                  >
+                    <span>
+                      Alcance
+                      {alcanceFilter.length > 0 && (
+                        <span className="ml-1.5 px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold">
+                          {alcanceFilter.length}
+                        </span>
+                      )}
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-52 p-2">
+                  <div className="space-y-1">
+                    {ALCANCE_OPTIONS.map((opt) => {
+                      const checked = alcanceFilter.includes(opt);
+                      return (
+                        <label
+                          key={opt}
+                          className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer text-sm"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(v) => {
+                              setAlcanceFilter((prev) =>
+                                v ? [...prev, opt] : prev.filter((x) => x !== opt)
+                              );
+                            }}
+                          />
+                          {opt}
+                        </label>
+                      );
+                    })}
+                    {alcanceFilter.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setAlcanceFilter([])}
+                        className="w-full text-left px-2 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-muted"
+                      >
+                        Limpiar selección
+                      </button>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
 
           <Select value={sortBy} onValueChange={setSortBy}>
