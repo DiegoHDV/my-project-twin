@@ -162,7 +162,9 @@ export function EventCard({ event, sponsorProfile, organizer, currentProfileId, 
         <div className="flex items-center justify-between mt-auto pt-1">
           {event.sponsorship_max != null && event.sponsorship_max > 0 ? (
             <span className="text-base font-bold text-foreground">
-              €{event.sponsorship_max.toLocaleString()}
+              {event.sponsorship_min != null && event.sponsorship_min > 0
+                ? `€${event.sponsorship_min.toLocaleString()} – €${event.sponsorship_max.toLocaleString()}`
+                : `€${event.sponsorship_max.toLocaleString()}`}
             </span>
           ) : (
             <span />
