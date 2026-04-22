@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Save, User, Camera, Loader2 } from "lucide-react";
 import { resolveAvatar } from "@/lib/avatar";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 
 const DESC_MAX = 500;
 
@@ -249,10 +250,10 @@ export default function ProfilePage() {
                     <Label className="font-semibold text-sm">
                       Ubicación <span className="text-destructive">*</span>
                     </Label>
-                    <Input
+                    <LocationAutocomplete
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      placeholder="Ciudad, Región, País (ej: Madrid, Comunidad de Madrid, España)"
+                      onChange={setLocation}
+                      placeholder="Empieza a escribir tu ciudad..."
                       required
                       className="h-11 rounded-xl"
                     />
