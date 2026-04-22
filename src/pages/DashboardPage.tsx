@@ -16,7 +16,7 @@ import type { Event, Profile } from "@/lib/supabase-helpers";
 import { calculateMatchScore } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
 import { toast } from "sonner";
-import { computeReach, REACH_OPTIONS, type Reach } from "@/lib/reach";
+import { computeReach, REACH_OPTIONS, reachMatchesFilter, type Reach } from "@/lib/reach";
 
 const CATEGORY_OPTIONS = [
   { label: "Categoría", value: "all" },
@@ -78,7 +78,7 @@ export default function DashboardPage() {
   const [budgetFilter, setBudgetFilter] = useState("all");
   const [sortBy, setSortBy] = useState<string>("match");
 
-  const [reachFilter, setReachFilter] = useState<Reach[]>([]);
+  const [reachFilter, setReachFilter] = useState<Reach | "all">("all");
 
   const [locations, setLocations] = useState<string[]>([]);
 
@@ -178,9 +178,9 @@ export default function DashboardPage() {
       const max = parseInt(budgetFilter);
       if ((e.sponsorship_max ?? 0) >= max) return false;
     }
-    if (reachFilter.length > 0 && sponsorHasLocation) {
+    if (reachFilter !== "all" && sponsorHasLocation) {
       const r = computeReach(e.location, sponsorLocation);
-      if (!r || !reachFilter.includes(r)) return false;
+      if (!reachMatchesFilter(r, reachFilter)) return false;
     }
     return true;
   });
@@ -414,53 +414,25 @@ export default function DashboardPage() {
             </Select>
 
             {profile?.role === "sponsor" && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    disabled={!sponsorHasLocation}
-                    title={!sponsorHasLocation ? "Configura tu ubicación en tu perfil para usar este filtro" : undefined}
-                    className="h-10 rounded-lg text-sm gap-1.5 bg-background"
-                  >
-                    <Globe2 className="h-4 w-4" />
-                    Alcance
-                    {reachFilter.length > 0 && (
-                      <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground text-[10px] font-bold">
-                        {reachFilter.length}
-                      </span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 p-3" align="start">
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Alcance</p>
-                    {REACH_OPTIONS.map((opt) => {
-                      const checked = reachFilter.includes(opt);
-                      return (
-                        <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm py-1">
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={(v) => {
-                              setReachFilter((prev) =>
-                                v ? [...prev, opt] : prev.filter((x) => x !== opt)
-                              );
-                            }}
-                          />
-                          {opt}
-                        </label>
-                      );
-                    })}
-                    {reachFilter.length > 0 && (
-                      <button
-                        onClick={() => setReachFilter([])}
-                        className="text-xs text-primary hover:underline mt-1"
-                      >
-                        Limpiar
-                      </button>
-                    )}
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <Select
+                value={reachFilter}
+                onValueChange={(v) => setReachFilter(v as Reach | "all")}
+                disabled={!sponsorHasLocation}
+              >
+                <SelectTrigger
+                  className="w-auto min-w-[140px] bg-background border-border rounded-lg h-10 text-sm gap-1.5"
+                  title={!sponsorHasLocation ? "Configura tu ubicación en tu perfil para usar este filtro" : undefined}
+                >
+                  <Globe2 className="h-4 w-4 text-muted-foreground" />
+                  <SelectValue placeholder="Alcance" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alcance: Todos</SelectItem>
+                  {REACH_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           </div>
 
