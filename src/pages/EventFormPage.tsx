@@ -201,6 +201,28 @@ export default function EventFormPage() {
               </div>
             </div>
 
+            <div>
+              <Label>
+                Alcance <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={alcance}
+                onValueChange={(v) => { setAlcance(v as Alcance); setAlcanceError(false); }}
+              >
+                <SelectTrigger className={alcanceError ? "border-destructive" : ""}>
+                  <SelectValue placeholder="Selecciona el alcance del evento" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ALCANCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {alcanceError && (
+                <p className="text-xs text-destructive mt-1">El alcance es obligatorio</p>
+              )}
+            </div>
+
             <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50">
               <Switch checked={published} onCheckedChange={setPublished} />
               <div>
