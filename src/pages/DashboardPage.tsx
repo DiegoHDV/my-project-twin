@@ -76,6 +76,7 @@ export default function DashboardPage() {
   const [audienceFilter, setAudienceFilter] = useState("all");
   const [budgetFilter, setBudgetFilter] = useState("all");
   const [sortBy, setSortBy] = useState<string>("match");
+  const [alcanceFilter, setAlcanceFilter] = useState<Alcance[]>([]);
 
   const [locations, setLocations] = useState<string[]>([]);
 
@@ -171,6 +172,10 @@ export default function DashboardPage() {
     if (budgetFilter !== "all") {
       const max = parseInt(budgetFilter);
       if ((e.sponsorship_max ?? 0) >= max) return false;
+    }
+    if (alcanceFilter.length > 0) {
+      const a = (e as any).alcance as Alcance | null | undefined;
+      if (!a || !alcanceFilter.includes(a)) return false;
     }
     return true;
   });
