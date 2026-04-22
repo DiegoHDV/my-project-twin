@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { computeReach, REACH_BADGE_CLASSES } from "@/lib/reach";
 
 interface EventCardProps {
   event: Event;
@@ -26,6 +27,7 @@ export function EventCard({ event, sponsorProfile, organizer, currentProfileId, 
 
   const matchScore = sponsorProfile ? calculateMatchScore(event, sponsorProfile) : null;
   const isStrongMatch = matchScore !== null && matchScore >= 80;
+  const reach = sponsorProfile ? computeReach(event.location, (sponsorProfile as any).location) : null;
 
   useEffect(() => {
     if (!currentProfileId) return;
@@ -87,14 +89,21 @@ export function EventCard({ event, sponsorProfile, organizer, currentProfileId, 
         )}
 
         {/* Top-left: Match badges */}
-        {matchScore !== null && (
-          <div className="absolute top-3 left-3 flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg bg-foreground/70 backdrop-blur-sm text-white text-xs font-bold tabular-nums">
-              {matchScore}% Match
-            </span>
+        {(matchScore !== null || reach) && (
+          <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2 max-w-[80%]">
+            {matchScore !== null && (
+              <span className="px-2.5 py-1 rounded-lg bg-foreground/70 backdrop-blur-sm text-white text-xs font-bold tabular-nums">
+                {matchScore}% Match
+              </span>
+            )}
             {isStrongMatch && (
               <span className="px-2.5 py-1 rounded-lg bg-emerald-500 text-white text-xs font-bold">
                 Perfect Fit
+              </span>
+            )}
+            {reach && (
+              <span className={cn("px-2.5 py-1 rounded-lg backdrop-blur-sm text-xs font-bold border", REACH_BADGE_CLASSES[reach])}>
+                {reach}
               </span>
             )}
           </div>

@@ -247,6 +247,7 @@ export type Database = {
           event_types: string[] | null
           id: string
           industry: string | null
+          location: string | null
           name: string
           preferred_activations: string[] | null
           preferred_audiences: string[] | null
@@ -270,6 +271,7 @@ export type Database = {
           event_types?: string[] | null
           id?: string
           industry?: string | null
+          location?: string | null
           name?: string
           preferred_activations?: string[] | null
           preferred_audiences?: string[] | null
@@ -293,6 +295,7 @@ export type Database = {
           event_types?: string[] | null
           id?: string
           industry?: string | null
+          location?: string | null
           name?: string
           preferred_activations?: string[] | null
           preferred_audiences?: string[] | null

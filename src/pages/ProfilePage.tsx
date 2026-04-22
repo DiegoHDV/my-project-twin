@@ -31,6 +31,7 @@ export default function ProfilePage() {
   const [preferredSectors, setPreferredSectors] = useState(((profile as any)?.preferred_sectors || []).join(", "));
   const [preferredAudiences, setPreferredAudiences] = useState(((profile as any)?.preferred_audiences || []).join(", "));
   const [preferredEventTypes, setPreferredEventTypes] = useState(((profile as any)?.preferred_event_types || []).join(", "));
+  const [location, setLocation] = useState((profile as any)?.location || "");
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -96,6 +97,13 @@ export default function ProfilePage() {
       updates.event_types = eventTypes.split(",").map(s => s.trim()).filter(Boolean);
       updates.social_links = socialLinks.split(",").map(s => s.trim()).filter(Boolean);
     } else {
+      // Validación: ubicación obligatoria para sponsors
+      if (!location.trim()) {
+        toast.error("La ubicación es obligatoria. Ej: Madrid, Comunidad de Madrid, España");
+        setLoading(false);
+        return;
+      }
+      updates.location = location.trim();
       updates.industry = industry.trim();
       updates.tags = tags.split(",").map(s => s.trim()).filter(Boolean);
       updates.budget_min = parseInt(budgetMin) || 0;
@@ -235,6 +243,22 @@ export default function ProfilePage() {
                   <div>
                     <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Información del sponsor</h2>
                     <Separator className="mt-2" />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="font-semibold text-sm">
+                      Ubicación <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder="Ciudad, Región, País (ej: Madrid, Comunidad de Madrid, España)"
+                      required
+                      className="h-11 rounded-xl"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Necesaria para calcular el alcance de los eventos (Local, Regional, Nacional, Internacional).
+                    </p>
                   </div>
 
                   <div className="space-y-1.5">

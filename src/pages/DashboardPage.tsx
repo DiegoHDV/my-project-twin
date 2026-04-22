@@ -5,7 +5,10 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { EventCard } from "@/components/EventCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarDays, ChevronLeft, ChevronRight, Sparkles, MapPin, TrendingUp, Bookmark } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, ChevronLeft, ChevronRight, Sparkles, MapPin, TrendingUp, Bookmark, Globe2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -13,6 +16,7 @@ import type { Event, Profile } from "@/lib/supabase-helpers";
 import { calculateMatchScore } from "@/lib/supabase-helpers";
 import { resolveAvatar } from "@/lib/avatar";
 import { toast } from "sonner";
+import { computeReach, REACH_OPTIONS, type Reach } from "@/lib/reach";
 
 const CATEGORY_OPTIONS = [
   { label: "Categoría", value: "all" },
@@ -74,7 +78,12 @@ export default function DashboardPage() {
   const [budgetFilter, setBudgetFilter] = useState("all");
   const [sortBy, setSortBy] = useState<string>("match");
 
+  const [reachFilter, setReachFilter] = useState<Reach[]>([]);
+
   const [locations, setLocations] = useState<string[]>([]);
+
+  const sponsorLocation = (profile as any)?.location as string | null | undefined;
+  const sponsorHasLocation = !!sponsorLocation && profile?.role === "sponsor";
 
   // Carousel
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -168,6 +177,10 @@ export default function DashboardPage() {
     if (budgetFilter !== "all") {
       const max = parseInt(budgetFilter);
       if ((e.sponsorship_max ?? 0) >= max) return false;
+    }
+    if (reachFilter.length > 0 && sponsorHasLocation) {
+      const r = computeReach(e.location, sponsorLocation);
+      if (!r || !reachFilter.includes(r)) return false;
     }
     return true;
   });
@@ -399,6 +412,56 @@ export default function DashboardPage() {
                 ))}
               </SelectContent>
             </Select>
+
+            {profile?.role === "sponsor" && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    disabled={!sponsorHasLocation}
+                    title={!sponsorHasLocation ? "Configura tu ubicación en tu perfil para usar este filtro" : undefined}
+                    className="h-10 rounded-lg text-sm gap-1.5 bg-background"
+                  >
+                    <Globe2 className="h-4 w-4" />
+                    Alcance
+                    {reachFilter.length > 0 && (
+                      <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground text-[10px] font-bold">
+                        {reachFilter.length}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-3" align="start">
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Alcance</p>
+                    {REACH_OPTIONS.map((opt) => {
+                      const checked = reachFilter.includes(opt);
+                      return (
+                        <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm py-1">
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(v) => {
+                              setReachFilter((prev) =>
+                                v ? [...prev, opt] : prev.filter((x) => x !== opt)
+                              );
+                            }}
+                          />
+                          {opt}
+                        </label>
+                      );
+                    })}
+                    {reachFilter.length > 0 && (
+                      <button
+                        onClick={() => setReachFilter([])}
+                        className="text-xs text-primary hover:underline mt-1"
+                      >
+                        Limpiar
+                      </button>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
 
           <Select value={sortBy} onValueChange={setSortBy}>
