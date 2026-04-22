@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
   ArrowLeft, DollarSign, Tag, MessageSquare, Globe, Briefcase,
-  Zap, Shield, Check, X, CheckCircle2, Users, Target, Heart,
+  Zap, Shield, Check, X, Minus, CheckCircle2, Users, Target, Heart,
 } from "lucide-react";
 import type { Profile, Event } from "@/lib/supabase-helpers";
 import { calculateMatchScore, getMatchBreakdown } from "@/lib/supabase-helpers";
@@ -333,9 +333,15 @@ export default function SponsorDetailPage() {
                         <div key={item.label} className="space-y-1">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">{item.label}</span>
-                            <span className={`flex items-center gap-1 text-xs font-medium ${item.compatible ? "text-emerald-500" : "text-destructive"}`}>
-                              {item.compatible ? (
+                            <span className={`flex items-center gap-1 text-xs font-medium ${
+                              item.level === "high" ? "text-emerald-500"
+                              : item.level === "medium" ? "text-amber-500"
+                              : "text-destructive"
+                            }`}>
+                              {item.level === "high" ? (
                                 <><Check className="h-3.5 w-3.5" /> Compatible</>
+                              ) : item.level === "medium" ? (
+                                <><Minus className="h-3.5 w-3.5" /> Intermedio</>
                               ) : (
                                 <><X className="h-3.5 w-3.5" /> No compatible</>
                               )}
