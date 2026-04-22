@@ -246,6 +246,22 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-1.5">
+                    <Label className="font-semibold text-sm">
+                      Ubicación <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder="Ciudad, Región, País (ej: Madrid, Comunidad de Madrid, España)"
+                      required
+                      className="h-11 rounded-xl"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Necesaria para calcular el alcance de los eventos (Local, Regional, Nacional, Internacional).
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
                     <Label className="font-semibold text-sm">Industria</Label>
                     <Input
                       value={industry}
