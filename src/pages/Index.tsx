@@ -1,8 +1,47 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Building2, Zap, MessageSquare, BarChart3, Shield } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import heroBg from "@/assets/hero-bg.jpg";
 import logoIso from "@/assets/logo-isotipo.png";
+import sponsorDiscover from "@/assets/preview-sponsor-discover.png";
+import sponsorConnect from "@/assets/preview-sponsor-connect.png";
+import sponsorManage from "@/assets/preview-sponsor-manage.png";
+import organizerPublish from "@/assets/preview-organizer-publish.png";
+import organizerProposals from "@/assets/preview-organizer-proposals.png";
+import organizerVisibility from "@/assets/preview-organizer-visibility.png";
+
+const sponsorPreview = [
+  { img: sponsorDiscover, title: "Descubre eventos", desc: "Explora eventos relevantes para tu marca y filtra por categoría o audiencia." },
+  { img: sponsorConnect, title: "Conecta con organizadores", desc: "Envía propuestas de patrocinio directamente desde la plataforma." },
+  { img: sponsorManage, title: "Gestiona tus acuerdos", desc: "Haz seguimiento de tus patrocinios activos y métricas clave." },
+];
+
+const organizerPreview = [
+  { img: organizerPublish, title: "Publica tu evento", desc: "Crea tu ficha de evento con todos los detalles para atraer sponsors." },
+  { img: organizerProposals, title: "Recibe propuestas", desc: "Revisa y responde a solicitudes de patrocinio en un solo lugar." },
+  { img: organizerVisibility, title: "Controla tu visibilidad", desc: "Ve cómo aparece tu evento ante los sponsors potenciales." },
+];
+
+function PreviewCards({ items }: { items: typeof sponsorPreview }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+      {items.map((it, i) => (
+        <div
+          key={it.title}
+          className="bg-card rounded-2xl p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 animate-slide-up flex flex-col items-center text-center"
+          style={{ animationDelay: `${0.08 * i}s`, animationFillMode: "both" }}
+        >
+          <div className="h-36 w-36 mb-4 flex items-center justify-center bg-muted/40 rounded-2xl">
+            <img src={it.img} alt={it.title} loading="lazy" width={512} height={512} className="h-32 w-32 object-contain" />
+          </div>
+          <h3 className="font-semibold text-base mb-1">{it.title}</h3>
+          <p className="text-sm text-muted-foreground">{it.desc}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function Index() {
   return (
