@@ -1,8 +1,47 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Building2, Zap, MessageSquare, BarChart3, Shield } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import heroBg from "@/assets/hero-bg.jpg";
 import logoIso from "@/assets/logo-isotipo.png";
+import sponsorDiscover from "@/assets/preview-sponsor-discover.png";
+import sponsorConnect from "@/assets/preview-sponsor-connect.png";
+import sponsorManage from "@/assets/preview-sponsor-manage.png";
+import organizerPublish from "@/assets/preview-organizer-publish.png";
+import organizerProposals from "@/assets/preview-organizer-proposals.png";
+import organizerVisibility from "@/assets/preview-organizer-visibility.png";
+
+const sponsorPreview = [
+  { img: sponsorDiscover, title: "Descubre eventos", desc: "Explora eventos relevantes para tu marca y filtra por categoría o audiencia." },
+  { img: sponsorConnect, title: "Conecta con organizadores", desc: "Envía propuestas de patrocinio directamente desde la plataforma." },
+  { img: sponsorManage, title: "Gestiona tus acuerdos", desc: "Haz seguimiento de tus patrocinios activos y métricas clave." },
+];
+
+const organizerPreview = [
+  { img: organizerPublish, title: "Publica tu evento", desc: "Crea tu ficha de evento con todos los detalles para atraer sponsors." },
+  { img: organizerProposals, title: "Recibe propuestas", desc: "Revisa y responde a solicitudes de patrocinio en un solo lugar." },
+  { img: organizerVisibility, title: "Controla tu visibilidad", desc: "Ve cómo aparece tu evento ante los sponsors potenciales." },
+];
+
+function PreviewCards({ items }: { items: typeof sponsorPreview }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+      {items.map((it, i) => (
+        <div
+          key={it.title}
+          className="bg-card rounded-2xl p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 animate-slide-up flex flex-col items-center text-center"
+          style={{ animationDelay: `${0.08 * i}s`, animationFillMode: "both" }}
+        >
+          <div className="h-36 w-36 mb-4 flex items-center justify-center bg-muted/40 rounded-2xl">
+            <img src={it.img} alt={it.title} loading="lazy" width={512} height={512} className="h-32 w-32 object-contain" />
+          </div>
+          <h3 className="font-semibold text-base mb-1">{it.title}</h3>
+          <p className="text-sm text-muted-foreground">{it.desc}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function Index() {
   return (
@@ -111,6 +150,40 @@ export default function Index() {
               <p className="text-sm text-muted-foreground">{feature.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Preview by role */}
+      <section className="py-20 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-10 animate-fade-in">
+            <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Vista previa</p>
+            <h2 className="text-3xl md:text-4xl font-bold">Esto es lo que encontrarás dentro</h2>
+            <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+              Una experiencia diseñada para cada rol. Elige el tuyo y descubre cómo funciona.
+            </p>
+          </div>
+
+          <Tabs defaultValue="sponsor" className="w-full">
+            <TabsList className="mx-auto flex w-full max-w-md rounded-full bg-card p-1 h-12">
+              <TabsTrigger value="sponsor" className="flex-1 rounded-full h-10 data-[state=active]:gradient-primary data-[state=active]:text-white">
+                Soy Sponsor
+              </TabsTrigger>
+              <TabsTrigger value="organizer" className="flex-1 rounded-full h-10 data-[state=active]:gradient-primary data-[state=active]:text-white">
+                Soy Organizador
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="sponsor"><PreviewCards items={sponsorPreview} /></TabsContent>
+            <TabsContent value="organizer"><PreviewCards items={organizerPreview} /></TabsContent>
+          </Tabs>
+
+          <div className="mt-12 text-center">
+            <Link to="/auth?mode=signup">
+              <Button size="lg" className="gradient-primary text-white border-0 rounded-full h-12 px-8 font-semibold">
+                Crear cuenta gratis <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
