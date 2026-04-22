@@ -303,7 +303,9 @@ export default function DashboardPage() {
                           <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/20">
                             {event.sponsorship_max != null && event.sponsorship_max > 0 ? (
                               <span className="text-base font-bold text-white">
-                                ${event.sponsorship_max.toLocaleString()}
+                                {event.sponsorship_min != null && event.sponsorship_min > 0
+                                  ? `$${event.sponsorship_min.toLocaleString()} – $${event.sponsorship_max.toLocaleString()}`
+                                  : `$${event.sponsorship_max.toLocaleString()}`}
                               </span>
                             ) : <span />}
                             {org && (
