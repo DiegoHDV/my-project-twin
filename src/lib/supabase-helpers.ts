@@ -122,6 +122,7 @@ export class MatchCalculator {
     weights += 25;
   }
 
+    return weights > 0 ? Math.round((score / weights) * 100) : 50;
   }
 
   static getMatchBreakdown(event: Event, sponsor: Profile, perspective: "sponsor" | "organizer" = "sponsor"): MatchBreakdownItem[] {
