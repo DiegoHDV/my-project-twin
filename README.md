@@ -12,6 +12,7 @@ Sponsorly es una plataforma web que conecta organizadores de eventos con sponsor
 
 - [Características](#-características)
 - [Arquitectura](#-arquitectura)
+- [Diseño orientado a clases](#-diseño-orientado-a-clases)
 - [Tech Stack](#-tech-stack)
 - [Estructura del proyecto](#-estructura-del-proyecto)
 - [Base de datos](#-base-de-datos)
@@ -69,6 +70,13 @@ La aplicación sigue una arquitectura **client-side SPA** con backend serverless
 │  └────┬─────┘  └────┬─────┘  └─────┬─────┘  │
 │       │              │              │        │
 │  ┌────┴──────────────┴──────────────┴─────┐  │
+│  │        Capa de clases (lib/ + services/)│  │
+│  │  MatchCalculator · ReachCalculator      │  │
+│  │  AvatarHelper · IntroMessageBuilder     │  │
+│  │  ApiClient (Singleton) · BaseService    │  │
+│  └────────────────┬───────────────────────┘  │
+│                   │                           │
+│  ┌────────────────┴───────────────────────┐  │
 │  │        Supabase Client SDK             │  │
 │  └────────────────┬───────────────────────┘  │
 └───────────────────┼──────────────────────────┘
@@ -92,10 +100,108 @@ La aplicación sigue una arquitectura **client-side SPA** con backend serverless
 
 ---
 
+## 🧩 Diseño orientado a clases
+
+El proyecto aplica **Programación Orientada a Objetos** en toda la lógica de negocio y la capa de infraestructura. La UI (componentes y páginas de React) sigue el estándar funcional de React, mientras que la lógica de dominio y acceso a datos está íntegramente encapsulada en clases.
+
+### Jerarquía de clases
+
+```
+                        ┌─────────────────┐
+                        │   ApiClient     │  ← Singleton
+                        │  (infraestr.)   │
+                        └────────┬────────┘
+                                 │ usa
+                        ┌────────┴────────┐
+                        │  BaseService    │  ← Clase abstracta
+                        │   (abstract)    │
+                        └────────┬────────┘
+                                 │ hereda
+          ┌──────────────────────┼──────────────────────┐
+          │                      │                      │
+  ┌───────┴──────┐     ┌─────────┴──────┐    ┌──────────┴─────┐
+  │ EventService │     │ MessageService │    │ ProfileService │
+  └──────────────┘     └────────────────┘    └────────────────┘
+
+  Utilidades de dominio (métodos estáticos):
+
+  ┌─────────────────┐   ┌──────────────────┐
+  │ MatchCalculator │   │ ReachCalculator  │
+  │ ─────────────── │   │ ──────────────── │
+  │ calculateMatch  │   │ computeReach()   │
+  │ Score()         │   │ reachMatches     │
+  │ getMatch        │   │ Filter()         │
+  │ Breakdown()     │   └──────────────────┘
+  └─────────────────┘
+  ┌─────────────────┐   ┌──────────────────────┐
+  │  AvatarHelper   │   │  IntroMessageBuilder │
+  │ ─────────────── │   │ ──────────────────── │
+  │ getDefaultAvatar│   │ build()              │
+  │ resolveAvatar() │   └──────────────────────┘
+  └─────────────────┘
+```
+
+### Descripción de cada clase
+
+#### `ApiClient` — `src/services/ApiClient.ts`
+Cliente HTTP con patrón **Singleton**. Gestiona la comunicación con las Edge Functions de Supabase inyectando automáticamente el JWT del usuario en cada petición. Solo existe una instancia en toda la aplicación.
+
+```ts
+const client = ApiClient.getInstance();
+await client.get<Event[]>("/events");
+```
+
+#### `BaseService` — `src/services/BaseService.ts`
+**Clase abstracta** que actúa como base de todos los servicios. Recibe el `ApiClient` por inyección de dependencias en el constructor, evitando que cada servicio gestione su propia instancia.
+
+```ts
+export abstract class BaseService {
+  protected readonly api: ApiClient;
+  constructor(api: ApiClient = ApiClient.getInstance()) {
+    this.api = api;
+  }
+}
+```
+
+#### `EventService` / `MessageService` / `ProfileService` — `src/services/`
+Servicios de dominio que **heredan de `BaseService`**. Cada uno expone métodos de negocio específicos para su entidad, usando `this.api` heredado para las llamadas HTTP.
+
+#### `MatchCalculator` — `src/lib/supabase-helpers.ts`
+Encapsula el algoritmo de compatibilidad entre eventos y sponsors. Todos sus métodos son **estáticos**, sin necesidad de instanciar la clase.
+
+```ts
+const score = MatchCalculator.calculateMatchScore(event, sponsor);
+const breakdown = MatchCalculator.getMatchBreakdown(event, sponsor, "sponsor");
+```
+
+#### `ReachCalculator` — `src/lib/reach.ts`
+Calcula el alcance geográfico de un evento respecto a la localización del sponsor (Local / Regional / Nacional / Internacional), usando un diccionario interno de ciudades de España e internacionales.
+
+```ts
+const reach = ReachCalculator.computeReach(event.location, sponsor.location);
+const matches = ReachCalculator.reachMatchesFilter(reach, "Regional");
+```
+
+#### `AvatarHelper` — `src/lib/avatar.ts`
+Resuelve la URL del avatar de un perfil, determinando si usar la imagen subida por el usuario o generar una foto determinista con `pravatar.cc` en función del ID del perfil.
+
+```ts
+const url = AvatarHelper.resolveAvatar(profile.avatar_url, profile.id);
+```
+
+#### `IntroMessageBuilder` — `src/lib/intro-message.ts`
+Construye el mensaje de presentación automático que se envía al iniciar una conversación, personalizando el texto según la perspectiva (sponsor u organizador) y las razones de compatibilidad del match.
+
+```ts
+const msg = IntroMessageBuilder.build(event, sponsor, "sponsor");
+```
+
+---
+
 ## 🛠 Tech Stack
 
 | Capa | Tecnología | Propósito |
-|------|-----------|-----------|
+|------|-----------|-----------| 
 | **Framework** | React 18 | Librería UI |
 | **Lenguaje** | TypeScript | Type safety |
 | **Bundler** | Vite 5 | Build tool rápido |
@@ -116,59 +222,65 @@ La aplicación sigue una arquitectura **client-side SPA** con backend serverless
 
 ```
 src/
-├── assets/                # Imágenes y recursos estáticos
-│   ├── hero-bg.jpg        # Fondo del hero en la landing
-│   └── logo-isotipo.png   # Isotipo de la marca
+├── assets/                  # Imágenes y recursos estáticos
 │
-├── components/            # Componentes reutilizables
-│   ├── ui/                # Componentes base shadcn/ui (~40 componentes)
+├── components/              # Componentes React reutilizables
+│   ├── ui/                  # Componentes base shadcn/ui (~40 componentes)
 │   ├── DashboardLayout.tsx  # Layout principal con Navbar
-│   ├── EventCard.tsx      # Tarjeta de evento con match score
-│   ├── SponsorCard.tsx    # Tarjeta de sponsor con match score
-│   ├── MatchBadge.tsx     # Badge visual de compatibilidad
-│   ├── Navbar.tsx         # Barra de navegación principal
-│   ├── NavLink.tsx        # Link de navegación con estado activo
-│   ├── ProtectedRoute.tsx # Guards de autenticación y perfil
-│   └── SendOfferDialog.tsx # Diálogo para enviar propuesta de contacto
+│   ├── EventCard.tsx        # Tarjeta de evento con match score
+│   ├── SponsorCard.tsx      # Tarjeta de sponsor con match score
+│   ├── MatchBadge.tsx       # Badge visual de compatibilidad
+│   ├── Navbar.tsx           # Barra de navegación principal
+│   ├── ProtectedRoute.tsx   # Guards de autenticación y perfil
+│   └── SendOfferDialog.tsx  # Diálogo para enviar propuesta de contacto
 │
 ├── contexts/
-│   └── AuthContext.tsx    # Provider global de autenticación
+│   └── AuthContext.tsx      # Provider global de autenticación
 │
 ├── hooks/
-│   ├── useAuth.ts         # Hook de autenticación (user, profile, session)
-│   ├── use-mobile.tsx     # Detección de dispositivo móvil
-│   └── use-toast.ts       # Hook para notificaciones toast
+│   ├── useAuth.ts           # Hook: user, profile, session
+│   ├── use-mobile.tsx       # Detección de dispositivo móvil
+│   └── use-toast.ts         # Hook para notificaciones toast
 │
 ├── integrations/
 │   └── supabase/
-│       ├── client.ts      # Cliente Supabase (auto-generado)
-│       └── types.ts       # Tipos de la DB (auto-generado)
+│       ├── client.ts        # Cliente Supabase (auto-generado)
+│       └── types.ts         # Tipos de la DB (auto-generado)
 │
-├── lib/
-│   ├── supabase-helpers.ts  # Tipos, calculateMatchScore(), getMatchBreakdown()
-│   ├── avatar.ts          # Resolución de URLs de avatar
-│   └── utils.ts           # Utilidades generales (cn, etc.)
+├── lib/                     # Lógica de dominio encapsulada en clases
+│   ├── supabase-helpers.ts  # Tipos + clase MatchCalculator
+│   ├── reach.ts             # Clase ReachCalculator + diccionario de ciudades
+│   ├── avatar.ts            # Clase AvatarHelper
+│   ├── intro-message.ts     # Clase IntroMessageBuilder
+│   └── utils.ts             # Utilidades generales (cn, etc.)
 │
-├── pages/
-│   ├── Index.tsx          # Landing page pública
-│   ├── AuthPage.tsx       # Login / Registro
-│   ├── OnboardingPage.tsx # Configuración inicial del perfil
-│   ├── DashboardPage.tsx  # Dashboard principal (eventos para sponsors)
-│   ├── SponsorsPage.tsx   # Explorar sponsors (para organizadores)
-│   ├── SponsorDetailPage.tsx  # Detalle de un sponsor
-│   ├── EventDetailPage.tsx    # Detalle de un evento
-│   ├── EventFormPage.tsx  # Crear/editar evento
-│   ├── EventsMapPage.tsx  # Mapa de eventos con Leaflet
-│   ├── MessagesPage.tsx   # Chat y conversaciones
-│   ├── ContactRequestsPage.tsx # Gestión de solicitudes
-│   ├── SavedEventsPage.tsx    # Eventos/sponsors guardados
-│   ├── ProfilePage.tsx    # Editar perfil
-│   ├── OrganizerProfilePage.tsx # Perfil público de organizador
-│   └── NotFound.tsx       # Página 404
+├── services/                # Capa de acceso a datos (clases con herencia)
+│   ├── ApiClient.ts         # Singleton HTTP client con JWT
+│   ├── BaseService.ts       # Clase abstracta base
+│   ├── EventService.ts      # Operaciones sobre eventos
+│   ├── MessageService.ts    # Operaciones sobre mensajes y conversaciones
+│   └── ProfileService.ts    # Operaciones sobre perfiles
+│
+├── pages/                   # Páginas de la aplicación (React funcional)
+│   ├── Index.tsx            # Landing page pública
+│   ├── AuthPage.tsx         # Login / Registro
+│   ├── OnboardingPage.tsx   # Configuración inicial del perfil
+│   ├── DashboardPage.tsx    # Panel principal (eventos para sponsors)
+│   ├── SponsorsPage.tsx     # Explorar sponsors (para organizadores)
+│   ├── SponsorDetailPage.tsx
+│   ├── EventDetailPage.tsx
+│   ├── EventFormPage.tsx    # Crear / editar evento
+│   ├── EventsMapPage.tsx    # Mapa de eventos con Leaflet
+│   ├── MessagesPage.tsx     # Chat y conversaciones
+│   ├── ContactRequestsPage.tsx
+│   ├── SavedEventsPage.tsx
+│   ├── ProfilePage.tsx
+│   ├── OrganizerProfilePage.tsx
+│   └── NotFound.tsx
 │
 └── test/
-    ├── setup.ts           # Configuración de Vitest
-    └── example.test.ts    # Test de ejemplo
+    ├── setup.ts             # Configuración de Vitest
+    └── example.test.ts      # Test de ejemplo
 ```
 
 ---
@@ -229,7 +341,7 @@ Expone: `user`, `profile`, `session`, `loading`, `signOut()`, `setProfile()`
 
 ## 🧠 Algoritmo de Match
 
-El match score se calcula en `calculateMatchScore()` con 4 dimensiones ponderadas:
+Implementado en la clase `MatchCalculator` (`src/lib/supabase-helpers.ts`). El score se calcula con 4 dimensiones ponderadas:
 
 | Dimensión | Peso | Lógica |
 |-----------|------|--------|
@@ -239,7 +351,7 @@ El match score se calcula en `calculateMatchScore()` con 4 dimensiones ponderada
 | **Presupuesto** | 25 pts | Solapamiento de rangos `budget_min/max` vs `sponsorship_min/max` |
 
 **Resultado**: Porcentaje de 0 a 100.  
-**Desglose**: `getMatchBreakdown()` devuelve explicación textual de cada dimensión con perspectiva organizador/sponsor.
+**Desglose**: `MatchCalculator.getMatchBreakdown()` devuelve explicación textual de cada dimensión con perspectiva organizador/sponsor.
 
 ---
 
@@ -268,10 +380,10 @@ El match score se calcula en `calculateMatchScore()` con 4 dimensiones ponderada
 
 ### Sponsor → Evento
 1. Sponsor explora eventos en el Dashboard
-2. Ve el match score en cada tarjeta
+2. Ve el match score en cada tarjeta (calculado por `MatchCalculator`)
 3. Entra al detalle y revisa el desglose del match
 4. Guarda el evento o envía solicitud de contacto
-5. Si es aceptada, se abre conversación de chat
+5. Si es aceptada, se abre conversación de chat con mensaje generado por `IntroMessageBuilder`
 
 ### Organizador → Sponsor
 1. Organizador explora sponsors en la página de Sponsors
