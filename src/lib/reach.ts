@@ -158,37 +158,9 @@ function parseLocation(loc: string | null | undefined): ParsedLocation {
   return parsed;
 }
 
-/**
- * Calcula el alcance de un evento dado el sponsor que lo visualiza.
- * Devuelve null si no hay datos suficientes para clasificar.
- */
-export function computeReach(
-  eventLocation: string | null | undefined,
-  sponsorLocation: string | null | undefined
-): Reach | null {
-  if (!eventLocation || !sponsorLocation) return null;
-  const e = parseLocation(eventLocation);
-  const s = parseLocation(sponsorLocation);
-
-  // Local: misma ciudad
-  if (e.city && s.city && e.city === s.city) return "Local";
-
-  // Internacional: países distintos conocidos
-  if (e.country && s.country && e.country !== s.country) return "Internacional";
-
-  // Regional: misma región (y por tanto, mismo país implícito)
-  if (e.region && s.region && e.region === s.region) return "Regional";
-
-  // Nacional: mismo país, regiones distintas (o región desconocida)
-  if (e.country && s.country && e.country === s.country) return "Nacional";
-
-  return null;
-}
-
 export const REACH_OPTIONS: Reach[] = ["Local", "Regional", "Nacional", "Internacional"];
 
 // Jerarquía inclusiva: cada nivel "incluye" los inferiores.
-// Internacional (4) incluye Nacional (3), Regional (2) y Local (1).
 const REACH_RANK: Record<Reach, number> = {
   Local: 1,
   Regional: 2,
@@ -196,18 +168,44 @@ const REACH_RANK: Record<Reach, number> = {
   Internacional: 4,
 };
 
-/**
- * ¿El alcance del evento (`eventReach`) entra dentro del filtro `selected` de forma inclusiva?
- * Internacional ⊇ Nacional ⊇ Regional ⊇ Local.
- */
-export function reachMatchesFilter(eventReach: Reach | null, selected: Reach): boolean {
-  if (!eventReach) return false;
-  return REACH_RANK[eventReach] <= REACH_RANK[selected];
-}
-
 export const REACH_BADGE_CLASSES: Record<Reach, string> = {
   Local: "bg-blue-500 text-white border-blue-500",
   Regional: "bg-emerald-500 text-white border-emerald-500",
   Nacional: "bg-orange-500 text-white border-orange-500",
   Internacional: "bg-purple-500 text-white border-purple-500",
 };
+
+/**
+ * ReachCalculator — clasifica el alcance geográfico de un evento respecto
+ * a la ubicación del sponsor que lo visualiza.
+ */
+export class ReachCalculator {
+  /**
+   * Calcula el alcance de un evento dado el sponsor que lo visualiza.
+   * Devuelve null si no hay datos suficientes para clasificar.
+   */
+  static computeReach(
+    eventLocation: string | null | undefined,
+    sponsorLocation: string | null | undefined
+  ): Reach | null {
+    if (!eventLocation || !sponsorLocation) return null;
+    const e = parseLocation(eventLocation);
+    const s = parseLocation(sponsorLocation);
+
+    if (e.city && s.city && e.city === s.city) return "Local";
+    if (e.country && s.country && e.country !== s.country) return "Internacional";
+    if (e.region && s.region && e.region === s.region) return "Regional";
+    if (e.country && s.country && e.country === s.country) return "Nacional";
+
+    return null;
+  }
+
+  /**
+   * ¿El alcance del evento entra dentro del filtro `selected` de forma inclusiva?
+   * Internacional ⊇ Nacional ⊇ Regional ⊇ Local.
+   */
+  static reachMatchesFilter(eventReach: Reach | null, selected: Reach): boolean {
+    if (!eventReach) return false;
+    return REACH_RANK[eventReach] <= REACH_RANK[selected];
+  }
+}
