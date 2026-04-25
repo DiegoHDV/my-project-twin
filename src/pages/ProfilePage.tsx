@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Save, User, Camera, Loader2 } from "lucide-react";
-import { resolveAvatar } from "@/lib/avatar";
+import { AvatarHelper } from "@/lib/avatar";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 
 const DESC_MAX = 500;
@@ -148,7 +148,7 @@ export default function ProfilePage() {
                 onChange={handleAvatarUpload}
               />
               <div className="h-20 w-20 rounded-full overflow-hidden ring-4 ring-background shadow-md">
-                <img src={resolveAvatar(profile.avatar_url, profile.id)} alt="" className="h-20 w-20 rounded-full object-cover" />
+                <img src={AvatarHelper.resolveAvatar(profile.avatar_url, profile.id)} alt="" className="h-20 w-20 rounded-full object-cover" />
               </div>
               <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 {uploadingAvatar ? (

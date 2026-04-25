@@ -11,8 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { Profile, Event } from "@/lib/supabase-helpers";
-import { calculateMatchScore } from "@/lib/supabase-helpers";
-import { resolveAvatar } from "@/lib/avatar";
+import { MatchCalculator } from "@/lib/supabase-helpers";
+import { AvatarHelper } from "@/lib/avatar";
 
 const INDUSTRY_PILLS = [
   "Tecnología",
@@ -137,7 +137,7 @@ export default function SponsorsPage() {
 
   const getAvgMatchForSponsor = (sponsor: Profile) => {
     if (events.length === 0) return 0;
-    const scores = events.map((e) => calculateMatchScore(e, sponsor));
+    const scores = events.map((e) => MatchCalculator.calculateMatchScore(e, sponsor));
     return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
   };
 

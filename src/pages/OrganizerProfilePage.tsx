@@ -6,7 +6,7 @@ import { EventCard } from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, User, Shield, CalendarDays, Globe, Building2 } from "lucide-react";
 import type { Event, Profile } from "@/lib/supabase-helpers";
-import { resolveAvatar } from "@/lib/avatar";
+import { AvatarHelper } from "@/lib/avatar";
 
 export default function OrganizerProfilePage() {
   const { id } = useParams();
@@ -61,7 +61,7 @@ export default function OrganizerProfilePage() {
         <div className="bg-card rounded-2xl shadow-card p-8">
           <div className="flex items-start gap-6">
             <div className="h-20 w-20 rounded-2xl overflow-hidden shrink-0">
-              <img src={resolveAvatar(organizer.avatar_url, organizer.id)} alt="" className="h-20 w-20 rounded-2xl object-cover" />
+              <img src={AvatarHelper.resolveAvatar(organizer.avatar_url, organizer.id)} alt="" className="h-20 w-20 rounded-2xl object-cover" />
             </div>
             <div className="space-y-2 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">

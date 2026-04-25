@@ -3,7 +3,7 @@ import { Bookmark, Briefcase, DollarSign, Tag, MessageSquare } from "lucide-reac
 import { MatchBadge } from "@/components/MatchBadge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { resolveAvatar } from "@/lib/avatar";
+import { AvatarHelper } from "@/lib/avatar";
 import type { Profile } from "@/lib/supabase-helpers";
 
 interface SponsorCardProps {
@@ -75,7 +75,7 @@ export function SponsorCard({
       <div className="flex justify-center -mt-10 relative z-10">
         <div className="h-[72px] w-[72px] rounded-2xl bg-card shadow-md ring-4 ring-card overflow-hidden group-hover:ring-primary/20 transition-all duration-300">
           <img
-            src={resolveAvatar(sponsor.avatar_url, sponsor.id)}
+            src={AvatarHelper.resolveAvatar(sponsor.avatar_url, sponsor.id)}
             alt={sponsor.name}
             className="h-full w-full object-cover"
           />

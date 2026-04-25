@@ -10,9 +10,9 @@ import {
   Zap, Shield, Check, X, Minus, CheckCircle2, Users, Target, Heart,
 } from "lucide-react";
 import type { Profile, Event } from "@/lib/supabase-helpers";
-import { calculateMatchScore, getMatchBreakdown } from "@/lib/supabase-helpers";
-import { resolveAvatar } from "@/lib/avatar";
-import { buildIntroMessage } from "@/lib/intro-message";
+import { MatchCalculator } from "@/lib/supabase-helpers";
+import { AvatarHelper } from "@/lib/avatar";
+import { IntroMessageBuilder } from "@/lib/intro-message";
 
 export default function SponsorDetailPage() {
   const { id } = useParams();
@@ -92,7 +92,7 @@ export default function SponsorDetailPage() {
     }
 
     // Auto-send a warm, structured intro message generated from the profile
-    const intro = buildIntroMessage(event, sponsor, "organizer");
+    const intro = IntroMessageBuilder.build(event, sponsor, "organizer");
     await supabase.from("messages").insert({
       conversation_id: created.id,
       sender_id: profile.id,
@@ -127,16 +127,16 @@ export default function SponsorDetailPage() {
   // Find best matching event for the breakdown
   const bestEvent = events.length > 0
     ? events.reduce((best, e) => {
-        const score = calculateMatchScore(e, sponsor);
+        const score = MatchCalculator.calculateMatchScore(e, sponsor);
         return score > (best.score || 0) ? { event: e, score } : best;
-      }, { event: events[0], score: calculateMatchScore(events[0], sponsor) })
+      }, { event: events[0], score: MatchCalculator.calculateMatchScore(events[0], sponsor) })
     : null;
 
   const avgMatch = events.length > 0
-    ? Math.round(events.map((e) => calculateMatchScore(e, sponsor)).reduce((a, b) => a + b, 0) / events.length)
+    ? Math.round(events.map((e) => MatchCalculator.calculateMatchScore(e, sponsor)).reduce((a, b) => a + b, 0) / events.length)
     : 0;
 
-  const matchBreakdown = bestEvent ? getMatchBreakdown(bestEvent.event, sponsor, "organizer") : null;
+  const matchBreakdown = bestEvent ? MatchCalculator.getMatchBreakdown(bestEvent.event, sponsor, "organizer") : null;
 
   const details = [
     { label: "Industria", value: sponsor.industry, icon: Briefcase },
@@ -184,7 +184,7 @@ export default function SponsorDetailPage() {
             </button>
             <div className="flex items-end gap-5">
               <div className="h-20 w-20 md:h-24 md:w-24 rounded-2xl overflow-hidden ring-4 ring-white/20 shadow-xl shrink-0">
-                <img src={resolveAvatar(sponsor.avatar_url, sponsor.id)} alt={sponsor.name} className="h-full w-full object-cover" />
+                <img src={AvatarHelper.resolveAvatar(sponsor.avatar_url, sponsor.id)} alt={sponsor.name} className="h-full w-full object-cover" />
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2.5">
@@ -363,7 +363,7 @@ export default function SponsorDetailPage() {
                     const isSending = sendingEvent === event.id;
                     const isLocked = !!lockedEvents[event.id];
                     const isDisabled = (!hasConv && (!!reqStatus || isSending || isLocked));
-                    const score = calculateMatchScore(event, sponsor);
+                    const score = MatchCalculator.calculateMatchScore(event, sponsor);
 
                     let statusLabel = "";
                     let statusIcon = <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />;

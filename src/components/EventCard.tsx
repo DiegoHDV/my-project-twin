@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { CalendarDays, MapPin, Users, Bookmark } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Event, AppRole, Profile } from "@/lib/supabase-helpers";
-import { calculateMatchScore } from "@/lib/supabase-helpers";
-import { resolveAvatar } from "@/lib/avatar";
+import { MatchCalculator } from "@/lib/supabase-helpers";
+import { AvatarHelper } from "@/lib/avatar";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { computeReach, REACH_BADGE_CLASSES } from "@/lib/reach";
+import { ReachCalculator, REACH_BADGE_CLASSES } from "@/lib/reach";
 
 interface EventCardProps {
   event: Event;
@@ -25,9 +25,9 @@ export function EventCard({ event, sponsorProfile, organizer, currentProfileId, 
   const [saved, setSaved] = useState(false);
   const [savingInProgress, setSavingInProgress] = useState(false);
 
-  const matchScore = sponsorProfile ? calculateMatchScore(event, sponsorProfile) : null;
+  const matchScore = sponsorProfile ? MatchCalculator.calculateMatchScore(event, sponsorProfile) : null;
   const isStrongMatch = matchScore !== null && matchScore >= 80;
-  const reach = sponsorProfile ? computeReach(event.location, (sponsorProfile as any).location) : null;
+  const reach = sponsorProfile ? ReachCalculator.computeReach(event.location, (sponsorProfile as any).location) : null;
 
   useEffect(() => {
     if (!currentProfileId) return;
@@ -182,7 +182,7 @@ export function EventCard({ event, sponsorProfile, organizer, currentProfileId, 
           {organizer && (
             <div className="flex items-center gap-2">
               <img
-                src={resolveAvatar(organizer.avatar_url, organizer.id || "")}
+                src={AvatarHelper.resolveAvatar(organizer.avatar_url, organizer.id || "")}
                 alt={organizer.name}
                 className="h-7 w-7 rounded-full object-cover"
               />
