@@ -276,6 +276,7 @@ export class MatchCalculator {
         : "El evento no tiene rango de patrocinio definido"));
   }
 
-  return items;
+    return items;
+  }
 }
 
