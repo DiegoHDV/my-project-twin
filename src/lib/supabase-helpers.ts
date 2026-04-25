@@ -122,24 +122,9 @@ export class MatchCalculator {
     weights += 25;
   }
 
-  return weights > 0 ? Math.round((score / weights) * 100) : 50;
-}
+  }
 
-export type MatchLevel = "high" | "medium" | "low";
-
-export interface MatchBreakdownItem {
-  label: string;
-  /** @deprecated use `level`. Kept for backwards compatibility (true when level === "high"). */
-  compatible: boolean;
-  level: MatchLevel;
-  reason: string;
-}
-
-function makeItem(label: string, level: MatchLevel, reason: string): MatchBreakdownItem {
-  return { label, level, compatible: level === "high", reason };
-}
-
-export function getMatchBreakdown(event: Event, sponsor: Profile, perspective: "sponsor" | "organizer" = "sponsor"): MatchBreakdownItem[] {
+  static getMatchBreakdown(event: Event, sponsor: Profile, perspective: "sponsor" | "organizer" = "sponsor"): MatchBreakdownItem[] {
   const items: MatchBreakdownItem[] = [];
   const isOrganizer = perspective === "organizer";
 
