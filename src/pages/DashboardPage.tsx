@@ -13,10 +13,10 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { Event, Profile } from "@/lib/supabase-helpers";
-import { calculateMatchScore } from "@/lib/supabase-helpers";
-import { resolveAvatar } from "@/lib/avatar";
+import { MatchCalculator } from "@/lib/supabase-helpers";
+import { AvatarHelper } from "@/lib/avatar";
 import { toast } from "sonner";
-import { computeReach, REACH_OPTIONS, reachMatchesFilter, type Reach } from "@/lib/reach";
+import { ReachCalculator, REACH_OPTIONS, type Reach } from "@/lib/reach";
 
 const CATEGORY_OPTIONS = [
   { label: "Categoría", value: "all" },
@@ -179,8 +179,8 @@ export default function DashboardPage() {
       if ((e.sponsorship_max ?? 0) >= max) return false;
     }
     if (reachFilter !== "all" && sponsorHasLocation) {
-      const r = computeReach(e.location, sponsorLocation);
-      if (!reachMatchesFilter(r, reachFilter)) return false;
+      const r = ReachCalculator.computeReach(e.location, sponsorLocation);
+      if (!ReachCalculator.reachMatchesFilter(r, reachFilter)) return false;
     }
     return true;
   });
@@ -188,7 +188,7 @@ export default function DashboardPage() {
   const sortedEvents = useMemo(() => {
     if (sortBy === "match" && profile?.role === "sponsor") {
       return [...filteredEvents].sort((a, b) => {
-        return calculateMatchScore(b, profile) - calculateMatchScore(a, profile);
+        return MatchCalculator.calculateMatchScore(b, profile) - MatchCalculator.calculateMatchScore(a, profile);
       });
     }
     if (sortBy === "date") {
@@ -203,7 +203,7 @@ export default function DashboardPage() {
   const topMatches = useMemo(() => {
     if (profile?.role !== "sponsor" || events.length === 0) return [];
     return [...events]
-      .map((e) => ({ event: e, score: calculateMatchScore(e, profile) }))
+      .map((e) => ({ event: e, score: MatchCalculator.calculateMatchScore(e, profile) }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 5);
   }, [events, profile]);
@@ -324,7 +324,7 @@ export default function DashboardPage() {
                             {org && (
                               <div className="flex items-center gap-2">
                                 <img
-                                  src={resolveAvatar(org.avatar_url, org.id)}
+                                  src={AvatarHelper.resolveAvatar(org.avatar_url, org.id)}
                                   alt=""
                                   className="h-6 w-6 rounded-full object-cover ring-2 ring-white/30"
                                 />

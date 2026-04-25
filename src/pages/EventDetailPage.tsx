@@ -12,9 +12,9 @@ import {
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { Event, Profile } from "@/lib/supabase-helpers";
-import { calculateMatchScore, getMatchBreakdown } from "@/lib/supabase-helpers";
-import { resolveAvatar } from "@/lib/avatar";
-import { buildIntroMessage } from "@/lib/intro-message";
+import { MatchCalculator } from "@/lib/supabase-helpers";
+import { AvatarHelper } from "@/lib/avatar";
+import { IntroMessageBuilder } from "@/lib/intro-message";
 
 const mockPackages = [
   { name: "Gold", benefits: ["Logo en escenario principal", "Stand 6x3m", "10 pases VIP", "Mención en RRSS"] },
@@ -102,7 +102,7 @@ export default function EventDetailPage() {
     }
 
     // Auto-send a warm, structured intro message generated from the profile
-    const intro = buildIntroMessage(event, profile, "sponsor");
+    const intro = IntroMessageBuilder.build(event, profile, "sponsor");
     await supabase.from("messages").insert({
       conversation_id: data.id,
       sender_id: profile.id,
@@ -133,8 +133,8 @@ export default function EventDetailPage() {
     );
   }
 
-  const matchScore = profile?.role === "sponsor" ? calculateMatchScore(event, profile) : null;
-  const matchBreakdown = profile?.role === "sponsor" ? getMatchBreakdown(event, profile) : null;
+  const matchScore = profile?.role === "sponsor" ? MatchCalculator.calculateMatchScore(event, profile) : null;
+  const matchBreakdown = profile?.role === "sponsor" ? MatchCalculator.getMatchBreakdown(event, profile) : null;
   const confirmedCount = event.confirmed_sponsors?.length || 0;
 
   const details = [
@@ -270,7 +270,7 @@ export default function EventDetailPage() {
                       className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
                     >
                       <div className="h-10 w-10 rounded-lg overflow-hidden shrink-0">
-                        <img src={resolveAvatar(sp.avatar_url, sp.id)} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                        <img src={AvatarHelper.resolveAvatar(sp.avatar_url, sp.id)} alt="" className="h-10 w-10 rounded-lg object-cover" />
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-sm">{sp.name}</p>
@@ -306,7 +306,7 @@ export default function EventDetailPage() {
                   className="flex items-center gap-4 rounded-xl border border-border bg-card p-5 transition-all hover:shadow-md hover:-translate-y-0.5"
                 >
                   <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-                    <img src={resolveAvatar(organizer.avatar_url, organizer.id)} alt="" className="h-12 w-12 rounded-full object-cover" />
+                    <img src={AvatarHelper.resolveAvatar(organizer.avatar_url, organizer.id)} alt="" className="h-12 w-12 rounded-full object-cover" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">

@@ -26,10 +26,27 @@ export async function getCurrentProfile() {
   return data;
 }
 
-export function calculateMatchScore(
-  event: Event,
-  sponsor: Profile
-): number {
+export type MatchLevel = "high" | "medium" | "low";
+
+export interface MatchBreakdownItem {
+  label: string;
+  /** @deprecated use `level`. Kept for backwards compatibility (true when level === "high"). */
+  compatible: boolean;
+  level: MatchLevel;
+  reason: string;
+}
+
+function makeItem(label: string, level: MatchLevel, reason: string): MatchBreakdownItem {
+  return { label, level, compatible: level === "high", reason };
+}
+
+/**
+ * MatchCalculator — calcula la puntuación y el desglose de match
+ * entre un evento y un sponsor. Implementado como clase con métodos
+ * estáticos para cumplir el requisito de arquitectura OO.
+ */
+export class MatchCalculator {
+  static calculateMatchScore(event: Event, sponsor: Profile): number {
   let score = 0;
   let weights = 0;
 
@@ -105,24 +122,10 @@ export function calculateMatchScore(
     weights += 25;
   }
 
-  return weights > 0 ? Math.round((score / weights) * 100) : 50;
-}
+    return weights > 0 ? Math.round((score / weights) * 100) : 50;
+  }
 
-export type MatchLevel = "high" | "medium" | "low";
-
-export interface MatchBreakdownItem {
-  label: string;
-  /** @deprecated use `level`. Kept for backwards compatibility (true when level === "high"). */
-  compatible: boolean;
-  level: MatchLevel;
-  reason: string;
-}
-
-function makeItem(label: string, level: MatchLevel, reason: string): MatchBreakdownItem {
-  return { label, level, compatible: level === "high", reason };
-}
-
-export function getMatchBreakdown(event: Event, sponsor: Profile, perspective: "sponsor" | "organizer" = "sponsor"): MatchBreakdownItem[] {
+  static getMatchBreakdown(event: Event, sponsor: Profile, perspective: "sponsor" | "organizer" = "sponsor"): MatchBreakdownItem[] {
   const items: MatchBreakdownItem[] = [];
   const isOrganizer = perspective === "organizer";
 
@@ -274,6 +277,7 @@ export function getMatchBreakdown(event: Event, sponsor: Profile, perspective: "
         : "El evento no tiene rango de patrocinio definido"));
   }
 
-  return items;
+    return items;
+  }
 }
 

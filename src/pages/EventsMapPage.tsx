@@ -8,7 +8,7 @@ import { CalendarDays, MapPin, ZoomIn, ZoomOut, Locate, ArrowLeft } from "lucide
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { Event, Profile } from "@/lib/supabase-helpers";
-import { calculateMatchScore } from "@/lib/supabase-helpers";
+import { MatchCalculator } from "@/lib/supabase-helpers";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -167,7 +167,7 @@ export default function EventsMapPage() {
     newEvents.forEach((event) => {
       loadedIdsRef.current.add(event.id);
 
-      const matchScore = profile?.role === "sponsor" ? calculateMatchScore(event, profile) : null;
+      const matchScore = profile?.role === "sponsor" ? MatchCalculator.calculateMatchScore(event, profile) : null;
       const marker = L.marker([event.latitude, event.longitude], {
         icon: createPin(false),
       });

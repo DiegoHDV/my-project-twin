@@ -13,7 +13,7 @@ import {
   Map,
 } from "lucide-react";
 import { useState } from "react";
-import { resolveAvatar } from "@/lib/avatar";
+import { AvatarHelper } from "@/lib/avatar";
 
 export function Navbar() {
   const { profile, signOut } = useAuthContext();
@@ -70,7 +70,7 @@ export function Navbar() {
             className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
           >
             <div className="h-7 w-7 rounded-full overflow-hidden">
-              <img src={resolveAvatar(profile?.avatar_url, profile?.id || "")} alt="" className="h-7 w-7 rounded-full object-cover" />
+              <img src={AvatarHelper.resolveAvatar(profile?.avatar_url, profile?.id || "")} alt="" className="h-7 w-7 rounded-full object-cover" />
             </div>
             <span className="text-sm font-medium">{profile?.name}</span>
           </Link>

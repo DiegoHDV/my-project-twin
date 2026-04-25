@@ -7,12 +7,12 @@ import { MatchBadge } from "@/components/MatchBadge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, User, CalendarDays, MessageSquare, Check, X, Clock, Loader2 } from "lucide-react";
-import { resolveAvatar } from "@/lib/avatar";
+import { AvatarHelper } from "@/lib/avatar";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import type { Conversation, Message, Profile, Event, ContactRequest } from "@/lib/supabase-helpers";
-import { calculateMatchScore } from "@/lib/supabase-helpers";
+import { MatchCalculator } from "@/lib/supabase-helpers";
 
 interface ConversationWithDetails extends Conversation {
   otherUser?: Profile;
@@ -222,7 +222,7 @@ export default function MessagesPage() {
                       <div className="flex items-center gap-3">
                         <div className="relative h-10 w-10 shrink-0">
                           <img
-                            src={resolveAvatar(otherUser?.avatar_url, otherUser?.id || id)}
+                            src={AvatarHelper.resolveAvatar(otherUser?.avatar_url, otherUser?.id || id)}
                             alt=""
                             className="h-10 w-10 rounded-full object-cover"
                           />
@@ -266,7 +266,7 @@ export default function MessagesPage() {
                 <div className="max-w-md w-full text-center space-y-6">
                   <div className="h-20 w-20 rounded-full mx-auto overflow-hidden ring-4 ring-amber-200">
                     <img
-                      src={resolveAvatar(activeReq.otherUser?.avatar_url, activeReq.otherUser?.id || activeReq.id)}
+                      src={AvatarHelper.resolveAvatar(activeReq.otherUser?.avatar_url, activeReq.otherUser?.id || activeReq.id)}
                       alt=""
                       className="h-20 w-20 rounded-full object-cover"
                     />
@@ -353,7 +353,7 @@ export default function MessagesPage() {
                 <div className="p-4 border-b border-border flex items-center gap-3">
                   <div className="h-9 w-9 rounded-full overflow-hidden">
                     <img
-                      src={resolveAvatar(activeConversation?.otherUser?.avatar_url, activeConversation?.otherUser?.id || activeConv)}
+                      src={AvatarHelper.resolveAvatar(activeConversation?.otherUser?.avatar_url, activeConversation?.otherUser?.id || activeConv)}
                       alt=""
                       className="h-9 w-9 rounded-full object-cover"
                     />
@@ -428,7 +428,7 @@ export default function MessagesPage() {
               <div className="text-center">
                 <div className="h-16 w-16 rounded-full overflow-hidden mx-auto mb-3">
                   <img
-                    src={resolveAvatar(activeConversation.otherUser?.avatar_url, activeConversation.otherUser?.id || activeConv!)}
+                    src={AvatarHelper.resolveAvatar(activeConversation.otherUser?.avatar_url, activeConversation.otherUser?.id || activeConv!)}
                     alt=""
                     className="h-16 w-16 rounded-full object-cover"
                   />
@@ -463,7 +463,7 @@ export default function MessagesPage() {
                 return (
                   <div className="flex flex-col items-center">
                     <p className="text-xs text-muted-foreground mb-2">Match Score</p>
-                    <MatchBadge score={calculateMatchScore(activeConversation.event!, sponsorProfile!)} size="lg" />
+                    <MatchBadge score={MatchCalculator.calculateMatchScore(activeConversation.event!, sponsorProfile!)} size="lg" />
                   </div>
                 );
               })()}
