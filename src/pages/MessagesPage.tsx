@@ -180,10 +180,10 @@ export default function MessagesPage() {
 
   return (
     <DashboardLayout>
-      <div className="bg-card rounded-2xl shadow-card overflow-hidden animate-fade-in" style={{ height: "calc(100vh - 8rem)" }}>
+      <div className="bg-card rounded-2xl shadow-card overflow-hidden animate-fade-in" style={{ height: "calc(100vh - 7rem)" }}>
         <div className="flex h-full">
-          {/* Sidebar */}
-          <div className="w-80 border-r border-border flex flex-col shrink-0">
+          {/* Sidebar - hide on mobile when chat is open */}
+          <div className={`${(activeConv || activeRequest) ? "hidden md:flex" : "flex"} w-full md:w-80 border-r border-border flex-col shrink-0`}>
             <div className="p-4 border-b border-border">
               <h2 className="font-semibold">Mensajes</h2>
               {pendingRequests.length > 0 && (
@@ -259,7 +259,7 @@ export default function MessagesPage() {
           </div>
 
           {/* Main area */}
-          <div className="flex-1 flex flex-col min-w-0">
+          <div className={`${(activeConv || activeRequest) ? "flex" : "hidden md:flex"} flex-1 flex-col min-w-0`}>
             {/* Pending request view */}
             {activeRequest && activeReq ? (
               <div className="flex-1 flex items-center justify-center p-8">
