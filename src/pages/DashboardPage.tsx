@@ -227,9 +227,9 @@ export default function DashboardPage() {
                 <div className="p-2 rounded-xl bg-primary/10">
                   <Sparkles className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <h2 className="font-bold text-2xl leading-tight">Eventos destacados</h2>
-                  <p className="text-sm text-muted-foreground">Eventos que encajan con tu perfil</p>
+              <div>
+                  <h2 className="font-bold text-xl sm:text-2xl leading-tight">Eventos destacados</h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Eventos que encajan con tu perfil</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -258,11 +258,11 @@ export default function DashboardPage() {
                   <div
                     key={event.id}
                     onClick={() => navigate(`/events/${event.id}`)}
-                    className="min-w-[440px] max-w-[480px] flex-shrink-0 snap-start cursor-pointer group"
+                    className="min-w-[85vw] sm:min-w-[400px] md:min-w-[440px] max-w-[480px] flex-shrink-0 snap-start cursor-pointer group"
                   >
                     <div className="relative rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                       {/* Full-width background image */}
-                      <div className="relative h-[260px] overflow-hidden">
+                      <div className="relative h-[200px] sm:h-[240px] md:h-[260px] overflow-hidden">
                         {event.media && event.media.length > 0 ? (
                           <img
                             src={event.media[0]}
@@ -346,10 +346,10 @@ export default function DashboardPage() {
 
         {/* Header + count */}
         <div className="animate-fade-in">
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-2xl sm:text-3xl font-bold">
             {profile?.role === "organizer" ? "Mis Eventos" : "Explorar eventos"}
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground">
             {sortedEvents.length} evento{sortedEvents.length !== 1 ? "s" : ""} disponible{sortedEvents.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -450,7 +450,7 @@ export default function DashboardPage() {
 
         {/* Events Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="bg-card rounded-xl h-80 animate-pulse" />
             ))}
@@ -466,7 +466,7 @@ export default function DashboardPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sortedEvents.map((event, i) => (
               <div
                 key={event.id}

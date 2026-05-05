@@ -59,16 +59,17 @@ export default function Index() {
       {/* Nav */}
       <header className="fixed top-0 w-full z-50 bg-card/80 backdrop-blur-lg border-b border-border">
         <div className="container flex items-center justify-between h-14">
-          <div className="flex items-center gap-2 font-bold text-lg">
+          <div className="flex items-center gap-2 font-bold text-base sm:text-lg">
             <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center overflow-hidden">
               <img src={logoIso} alt="Sponsorly" className="h-5 w-5 object-contain brightness-0 invert" />
             </div>
             Sponsorly
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Link to="/auth">
-              <Button variant="ghost" size="sm" className="rounded-pill">
-                Iniciar sesión
+              <Button variant="ghost" size="sm" className="rounded-pill px-2 sm:px-4">
+                <span className="hidden xs:inline sm:inline">Iniciar sesión</span>
+                <span className="xs:hidden sm:hidden">Entrar</span>
               </Button>
             </Link>
             <Link to="/auth?mode=signup">
@@ -86,10 +87,10 @@ export default function Index() {
           <img src={heroBg} alt="" className="w-full h-full object-cover opacity-30" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
         </div>
-        <div className="container relative z-10 py-24 md:py-32">
+        <div className="container relative z-10 py-16 sm:py-24 md:py-32">
           <div className="max-w-2xl animate-slide-up">
             <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Conectar marcas, crear momentos.</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.08] tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.08] tracking-tight">
               El punto de encuentro entre eventos y marcas
             </h1>
             <p className="mt-5 text-lg text-muted-foreground max-w-lg">
@@ -108,14 +109,14 @@ export default function Index() {
       </section>
 
       {/* Features */}
-      <section className="py-20 container">
-        <div className="text-center mb-12 animate-fade-in">
-          <h2 className="text-3xl font-bold">Todo lo que necesitas</h2>
+      <section className="py-12 sm:py-20 container">
+        <div className="text-center mb-10 sm:mb-12 animate-fade-in">
+          <h2 className="text-2xl sm:text-3xl font-bold">Todo lo que necesitas</h2>
           <p className="text-muted-foreground mt-2 max-w-md mx-auto">
             Herramientas diseñadas para simplificar la conexión entre eventos y marcas
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {[
             {
               icon: Users,
@@ -164,11 +165,11 @@ export default function Index() {
       </section>
 
       {/* Preview by role */}
-      <section className="py-20 bg-muted/30">
+      <section className="py-12 sm:py-20 bg-muted/30">
         <div className="container">
-          <div className="text-center mb-10 animate-fade-in">
+          <div className="text-center mb-8 sm:mb-10 animate-fade-in">
             <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Vista previa</p>
-            <h2 className="text-3xl md:text-4xl font-bold">Esto es lo que encontrarás dentro</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Esto es lo que encontrarás dentro</h2>
             <p className="text-muted-foreground mt-2 max-w-md mx-auto">
               Una experiencia diseñada para cada rol. Elige el tuyo y descubre cómo funciona.
             </p>
@@ -198,11 +199,11 @@ export default function Index() {
       </section>
 
       {/* Match Score spotlight */}
-      <section className="py-20 container">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <section className="py-12 sm:py-20 container">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center">
           <div className="animate-slide-up">
             <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Match Score</p>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
               Sabe al instante si una marca y un evento encajan
             </h2>
             <p className="mt-4 text-muted-foreground text-lg">
@@ -229,10 +230,10 @@ export default function Index() {
       </section>
 
       {/* CTA */}
-      <section className="py-20">
+      <section className="py-12 sm:py-20">
         <div className="container">
-          <div className="gradient-primary rounded-2xl p-10 md:p-16 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ lineHeight: '1.1' }}>
+          <div className="gradient-primary rounded-2xl p-6 sm:p-10 md:p-16 text-center">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4" style={{ lineHeight: '1.1' }}>
               Empieza a conectar hoy
             </h2>
             <p className="text-white/80 mb-8 max-w-md mx-auto">
@@ -249,7 +250,7 @@ export default function Index() {
 
       {/* Footer */}
       <footer className="py-8 border-t border-border">
-          <div className="container flex items-center justify-between text-sm text-muted-foreground">
+          <div className="container flex flex-col sm:flex-row items-center gap-3 sm:gap-0 sm:justify-between text-sm text-muted-foreground text-center">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-md gradient-primary flex items-center justify-center overflow-hidden">
               <img src={logoIso} alt="Sponsorly" className="h-4 w-4 object-contain brightness-0 invert" />
