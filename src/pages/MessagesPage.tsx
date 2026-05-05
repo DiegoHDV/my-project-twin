@@ -6,7 +6,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { MatchBadge } from "@/components/MatchBadge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, User, CalendarDays, MessageSquare, Check, X, Clock, Loader2 } from "lucide-react";
+import { Send, User, CalendarDays, MessageSquare, Check, X, Clock, Loader2, ArrowLeft } from "lucide-react";
 import { AvatarHelper } from "@/lib/avatar";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -180,10 +180,10 @@ export default function MessagesPage() {
 
   return (
     <DashboardLayout>
-      <div className="bg-card rounded-2xl shadow-card overflow-hidden animate-fade-in" style={{ height: "calc(100vh - 8rem)" }}>
+      <div className="bg-card rounded-2xl shadow-card overflow-hidden animate-fade-in" style={{ height: "calc(100vh - 7rem)" }}>
         <div className="flex h-full">
-          {/* Sidebar */}
-          <div className="w-80 border-r border-border flex flex-col shrink-0">
+          {/* Sidebar - hide on mobile when chat is open */}
+          <div className={`${(activeConv || activeRequest) ? "hidden md:flex" : "flex"} w-full md:w-80 border-r border-border flex-col shrink-0`}>
             <div className="p-4 border-b border-border">
               <h2 className="font-semibold">Mensajes</h2>
               {pendingRequests.length > 0 && (
@@ -259,10 +259,13 @@ export default function MessagesPage() {
           </div>
 
           {/* Main area */}
-          <div className="flex-1 flex flex-col min-w-0">
+          <div className={`${(activeConv || activeRequest) ? "flex" : "hidden md:flex"} flex-1 flex-col min-w-0`}>
             {/* Pending request view */}
             {activeRequest && activeReq ? (
-              <div className="flex-1 flex items-center justify-center p-8">
+              <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 overflow-y-auto">
+                <button onClick={() => setActiveRequest(null)} className="md:hidden self-start mb-2 -ml-1 p-1.5 rounded-lg hover:bg-muted text-muted-foreground" aria-label="Volver">
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
                 <div className="max-w-md w-full text-center space-y-6">
                   <div className="h-20 w-20 rounded-full mx-auto overflow-hidden ring-4 ring-amber-200">
                     <img
@@ -351,16 +354,23 @@ export default function MessagesPage() {
               <>
                 {/* Chat header */}
                 <div className="p-4 border-b border-border flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full overflow-hidden">
+                  <button
+                    onClick={() => setActiveConv(null)}
+                    className="md:hidden p-1.5 -ml-1 rounded-lg hover:bg-muted text-muted-foreground"
+                    aria-label="Volver"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </button>
+                  <div className="h-9 w-9 rounded-full overflow-hidden shrink-0">
                     <img
                       src={AvatarHelper.resolveAvatar(activeConversation?.otherUser?.avatar_url, activeConversation?.otherUser?.id || activeConv)}
                       alt=""
                       className="h-9 w-9 rounded-full object-cover"
                     />
                   </div>
-                  <div>
-                    <p className="font-medium text-sm">{activeConversation?.otherUser?.name}</p>
-                    <p className="text-xs text-muted-foreground">{activeConversation?.event?.title}</p>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{activeConversation?.otherUser?.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{activeConversation?.event?.title}</p>
                   </div>
                 </div>
 

@@ -135,7 +135,7 @@ export default function EventFormPage() {
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe el evento..." rows={4} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label>Tipo</Label>
                 <Input value={type} onChange={(e) => setType(e.target.value)} placeholder="Conferencia, Festival..." />
@@ -146,7 +146,7 @@ export default function EventFormPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label>Fecha y hora</Label>
                 <Input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -157,7 +157,7 @@ export default function EventFormPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label>Latitud</Label>
                 <Input type="number" step="any" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="40.4168" />
@@ -168,7 +168,7 @@ export default function EventFormPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label>Capacidad</Label>
                 <Input type="number" value={capacity} onChange={(e) => setCapacity(e.target.value)} placeholder="500" />
@@ -179,7 +179,7 @@ export default function EventFormPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label>Sponsorship mín (USD)</Label>
                 <Input type="number" value={sponsorshipMin} onChange={(e) => setSponsorshipMin(e.target.value)} placeholder="1000" />

@@ -278,7 +278,7 @@ export default function SponsorsPage() {
 
         {/* Sponsors Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="bg-card rounded-xl h-72 animate-pulse" />
             ))}
@@ -290,7 +290,7 @@ export default function SponsorsPage() {
             <p className="text-muted-foreground mt-1">Aún no hay sponsors en la plataforma</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...filteredSponsors]
               .sort((a, b) => {
                 if (sortBy === "match") return getAvgMatchForSponsor(b) - getAvgMatchForSponsor(a);

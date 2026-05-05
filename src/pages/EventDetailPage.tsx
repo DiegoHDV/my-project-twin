@@ -117,7 +117,7 @@ export default function EventDetailPage() {
       <DashboardLayout>
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="bg-card rounded-2xl h-80 animate-pulse" />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map(i => <div key={i} className="bg-card rounded-xl h-24 animate-pulse" />)}
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function EventDetailPage() {
             >
               <ArrowLeft className="h-4 w-4" /> Volver a eventos
             </button>
-            <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md" style={{ lineHeight: 1.1 }}>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-md" style={{ lineHeight: 1.1 }}>
               {event.title}
             </h1>
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-white/80 text-sm">

@@ -108,7 +108,7 @@ export default function SponsorDetailPage() {
       <DashboardLayout>
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="bg-card rounded-2xl h-80 animate-pulse" />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map(i => <div key={i} className="bg-card rounded-xl h-24 animate-pulse" />)}
           </div>
         </div>
