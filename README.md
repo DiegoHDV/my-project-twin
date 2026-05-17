@@ -12,6 +12,7 @@ Sponsorly es una plataforma web que conecta organizadores de eventos con sponsor
 
 - [Características](#-características)
 - [Arquitectura](#-arquitectura)
+- [Backend (API + Base de datos)](#-backend-api--base-de-datos)
 - [Diseño orientado a clases](#-diseño-orientado-a-clases)
 - [Tech Stack](#-tech-stack)
 - [Estructura del proyecto](#-estructura-del-proyecto)
@@ -97,6 +98,92 @@ La aplicación sigue una arquitectura **client-side SPA** con backend serverless
         │  └─────────────────┘  │
         └───────────────────────┘
 ```
+
+---
+
+## 🛰 Backend (API + Base de datos)
+
+Sponsorly **no tiene servidor propio**: todo el backend vive en **Lovable Cloud / Supabase**. Hay dos vías de acceso desde el cliente:
+
+1. **Cliente Supabase** (`@supabase/supabase-js`) directo desde el frontend, contra la base de datos PostgreSQL. La seguridad la imponen **políticas RLS** por tabla.
+2. **API REST propia** desplegada como **Edge Function** (`supabase/functions/api/`), escrita en **Deno + TypeScript** con arquitectura **MVC** (Controller → Service → Repository) en POO y **JWT obligatorio** en todos los endpoints.
+
+Ambos caminos coexisten: la mayoría de páginas usan el cliente Supabase con RLS, y la API se usa para flujos donde queremos lógica de negocio explícita o reutilizable (ver `/api-demo`).
+
+### Stack del backend
+
+| Capa | Tecnología |
+|------|-----------|
+| Runtime API | Supabase Edge Functions (Deno) |
+| Base de datos | PostgreSQL gestionado por Supabase |
+| Auth | Supabase Auth (JWT) |
+| Storage | Supabase Storage (bucket `avatars`) |
+| Realtime | Supabase Realtime sobre tablas `messages` y `conversations` |
+| Migraciones | SQL versionado en `supabase/migrations/` |
+
+### Arquitectura de la Edge Function `api`
+
+```
+Request
+  ├─ CORS preflight (OPTIONS)
+  ├─ AuthMiddleware ──► JwtValidator ──► RequestContext { user, supabase, url, req }
+  ├─ Router ──► Controller ──► Service ──► Repository ──► PostgreSQL (RLS)
+  └─ ErrorMiddleware ──► respuesta JSON uniforme
+```
+
+- **Controllers** (`controllers/`): parsean params/body y delegan en servicios.
+- **Services** (`services/`): reglas de negocio y autorización fina (p. ej. "solo organizadores crean eventos").
+- **Repositories** (`repositories/`): único punto de acceso a Postgres. Heredan CRUD genérico de `BaseRepository`.
+- **Middlewares** (`middleware/`): JWT (`AuthMiddleware`) y traducción de excepciones (`ErrorMiddleware`).
+- **Core** (`core/`): `JwtValidator`, `HttpException` y subclases (401/403/404/400), `ResponseFactory` (Singleton) y `corsHeaders`.
+
+El cliente Supabase se construye **con el JWT del usuario**, por lo que las consultas siguen respetando las políticas RLS de cada tabla.
+
+### Endpoints disponibles
+
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| `GET` | `/api/events` | JWT | Lista eventos publicados |
+| `GET` | `/api/events/:id` | JWT | Detalle de un evento |
+| `POST` | `/api/events` | JWT (rol `organizer`) | Crea un evento |
+| `GET` | `/api/profiles/me` | JWT | Perfil del usuario autenticado |
+| `GET` | `/api/profiles` | JWT | Lista de sponsors |
+| `GET` | `/api/messages?conversationId=…` | JWT | Mensajes de una conversación |
+| `POST` | `/api/messages` | JWT | Envía un mensaje |
+
+Errores estándar (401 / 403 / 404 / 400 / 500) se devuelven como `{ error, status, details? }`.
+
+### Tablas y enums
+
+| Tabla | Descripción |
+|-------|-------------|
+| `profiles` | Usuarios con rol y preferencias (organizer / sponsor) |
+| `events` | Eventos creados por organizadores (incluye `latitude`/`longitude` y `published`) |
+| `conversations` | Hilos de chat ligados a un evento entre 1 organizador y 1 sponsor |
+| `messages` | Mensajes de una conversación (Realtime activo) |
+| `contact_requests` | Solicitudes de patrocinio con estado `pending` / `accepted` / `rejected` |
+| `saved_events` | Marcadores de eventos por perfil |
+| `saved_sponsors` | Marcadores de sponsors por perfil |
+
+Enums: `app_role` (`organizer` / `sponsor`), `contact_request_status` (`pending` / `accepted` / `rejected`).
+
+### Funciones SQL y triggers
+
+- `get_user_role(user_id)`, `get_profile_id(user_id)`, `is_conversation_participant(conv_id, user_id)` — `SECURITY DEFINER`, usadas por las políticas RLS para evitar recursión.
+- `update_updated_at_column()` — trigger genérico de timestamp en `profiles`, `events` y `contact_requests`.
+- `handle_new_user()` — placeholder; el perfil se crea en el onboarding, no automáticamente.
+
+### Storage
+
+Bucket público `avatars`. Cada usuario solo puede subir/modificar/eliminar archivos bajo el prefijo `avatars/<auth.uid()>/`.
+
+### Realtime
+
+`messages` y `conversations` están añadidas a la publicación `supabase_realtime`. La página `MessagesPage` se suscribe a `postgres_changes` para chat en vivo.
+
+### Documentación de detalle
+
+Para tipos de arquitectura, decisiones tomadas, ER, RLS detalladas, plan de tests, validación y árbol de ficheros, ver el directorio [`docs/`](docs/).
 
 ---
 
