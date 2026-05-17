@@ -1,0 +1,110 @@
+<mxfile host="app.diagrams.net" agent="sponsorly-docs">
+  <diagram id="system-overview" name="System overview">
+    <mxGraphModel dx="6813" dy="3760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fillColor=none;strokeColor=none;" value="Sponsorly — System overview" vertex="1">
+          <mxGeometry height="32" width="1320" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=2;fillColor=none;strokeColor=none;" value="SPA (React + Vite) ↔ Supabase / Lovable Cloud (Auth · Edge Function `api` con POO en capas · PostgreSQL con RLS · Storage · Realtime)" vertex="1">
+          <mxGeometry height="22" width="1320" x="40" y="52" as="geometry" />
+        </mxCell>
+        <mxCell id="browser" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;verticalAlign=top;" value="Navegador — SPA" vertex="1">
+          <mxGeometry height="680" width="540" x="60" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="browser-stack" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fillColor=none;strokeColor=none;" value="React 18 · Vite 5 · TypeScript · Tailwind · shadcn/ui · React Router · TanStack Query" vertex="1">
+          <mxGeometry height="22" width="500" x="80" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="ui-layer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;" value="Capa UI" vertex="1">
+          <mxGeometry height="180" width="500" x="80" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="pages" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="pages/&#xa;Index · Auth · Onboarding · Dashboard · EventForm · EventDetail · Sponsors · SponsorDetail · OrganizerProfile · Profile · Messages · ContactRequests · SavedEvents · EventsMap · ApiDemo · NotFound" vertex="1">
+          <mxGeometry height="70" width="476" x="92" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="components" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="components/&#xa;DashboardLayout · Navbar · ProtectedRoute · RequireProfile · EventCard · SponsorCard · MatchBadge · SendOfferDialog · LocationAutocomplete &#xa;components/ui/* (shadcn ~40)" vertex="1">
+          <mxGeometry height="70" width="480" x="90" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="state-layer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;" value="Estado &amp; hooks" vertex="1">
+          <mxGeometry height="95" width="500" x="80" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="state-content" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="contexts/AuthContext (user, profile, session)&#xa;hooks/useAuth · use-mobile · use-toast&#xa;TanStack QueryClientProvider (montado, uso puntual)" vertex="1">
+          <mxGeometry height="55" width="476" x="92" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="domain-layer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;" value="Lógica de dominio (clases con métodos estáticos)" vertex="1">
+          <mxGeometry height="100" width="500" x="80" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="domain-content" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="src/lib/&#xa;MatchCalculator (sector 30 · tipo 25 · audiencia 20 · presupuesto 25)&#xa;ReachCalculator (Local / Regional / Nacional / Internacional)&#xa;AvatarHelper · IntroMessageBuilder · utils.cn" vertex="1">
+          <mxGeometry height="62" width="476" x="92" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="infra-layer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;" value="Acceso a datos (cliente)" vertex="1">
+          <mxGeometry height="190" width="500" x="80" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="supa-client" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="integrations/supabase/client.ts&#xa;@supabase/supabase-js (auth + DB + Realtime + Storage)" vertex="1">
+          <mxGeometry height="50" width="476" x="92" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="api-client" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="src/services/&lt;br&gt;ApiClient (Singleton, inyecta JWT)&lt;br&gt;BaseService -&amp;gt; EventService · ProfileService · MessageService" vertex="1">
+          <mxGeometry height="80" width="476" x="92" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="cloud" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;verticalAlign=top;" value="Supabase / Lovable Cloud" vertex="1">
+          <mxGeometry height="680" width="600" x="760" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;align=center;verticalAlign=middle;fontSize=10;" value="Auth (JWT)&#xa;Email + password · email verification" vertex="1">
+          <mxGeometry height="60" width="280" x="780" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="storage-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;align=center;verticalAlign=middle;fontSize=10;" value="Storage&lt;br&gt;bucket público avatars&lt;br&gt;path: avatars/{auth.uid()}/" vertex="1">
+          <mxGeometry height="60" width="260" x="1080" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="edge" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;verticalAlign=top;" value="Edge Function api (Deno + TS)&lt;br&gt;Arquitectura POO en capas" vertex="1">
+          <mxGeometry height="320" width="560" x="780" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-pipeline" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="Deno.serve(req)&lt;br&gt;1. CORS preflight&lt;br&gt;2. AuthMiddleware -&amp;gt; JwtValidator -&amp;gt; RequestContext { user, supabase, url, req }&lt;br&gt;3. Router.dispatch(ctx)&lt;br&gt;4. ErrorMiddleware (excepciones -&amp;gt; JSON uniforme)" vertex="1">
+          <mxGeometry height="80" width="536" x="792" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="controllers" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="controllers/&#xa;EventsController · ProfilesController · MessagesController&#xa;extends BaseController" vertex="1">
+          <mxGeometry height="50" width="536" x="792" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="services-be" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="services/&#xa;EventService (role check) · ProfileService · MessageService&#xa;extends BaseService" vertex="1">
+          <mxGeometry height="55" width="536" x="792" y="395" as="geometry" />
+        </mxCell>
+        <mxCell id="repos" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="repositories/&#xa;EventRepository · ProfileRepository · MessageRepository&#xa;extends BaseRepository&lt;T&gt; (CRUD genérico, respeta RLS)" vertex="1">
+          <mxGeometry height="60" width="536" x="792" y="455" as="geometry" />
+        </mxCell>
+        <mxCell id="db" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;verticalAlign=top;" value="PostgreSQL (managed)" vertex="1">
+          <mxGeometry height="220" width="560" x="780" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="db-tables" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="Tablas&#xa;profiles · events · conversations · messages · contact_requests · saved_events · saved_sponsors&#xa;Enums: app_role (organizer/sponsor) · contact_request_status (pending/accepted/rejected)" vertex="1">
+          <mxGeometry height="55" width="536" x="792" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="db-rls" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=10;" value="RLS habilitado en TODAS las tablas&#xa;Helpers SECURITY DEFINER: get_user_role · get_profile_id · is_conversation_participant&#xa;Triggers: update_updated_at_column en profiles, events, contact_requests" vertex="1">
+          <mxGeometry height="60" width="536" x="792" y="635" as="geometry" />
+        </mxCell>
+        <mxCell id="db-realtime" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=middle;spacingLeft=8;fontSize=10;" value="Realtime: publication supabase_realtime sobre `messages` y `conversations`" vertex="1">
+          <mxGeometry height="42" width="536" x="792" y="705" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-supa" edge="1" parent="1" source="repos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#9673a6;endArrow=block;startArrow=none;" target="db-tables">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-direct" edge="1" parent="1" source="supa-client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.05;strokeColor=#82b366;strokeWidth=2;endArrow=block;" target="cloud">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-direct-label" connectable="0" parent="arrow-direct" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="(1) supabase-js&#xa;auth + DB (RLS) + Realtime + Storage" vertex="1">
+          <mxGeometry relative="1" x="-0.05" as="geometry">
+            <mxPoint y="-126" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-api" edge="1" parent="1" source="api-client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;strokeColor=#d79b00;strokeWidth=2;endArrow=block;" target="edge">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-api-label" connectable="0" parent="arrow-api" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="(2) fetch /api/...&#xa;Authorization: Bearer &lt;jwt&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.05" as="geometry">
+            <mxPoint y="-20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fontSize=10;" value="Leyenda&lt;br&gt;• Verde: ruta directa cliente Supabase&lt;br&gt;• Naranja: ruta vía Edge Function api (POO en capas)&lt;br&gt;• Morado: PostgreSQL gestionado con RLS&lt;br&gt;• Amarillo: ficheros TS clave de capa de servicios&lt;br&gt;Todas las consultas, directas o vía API, quedan filtradas por las políticas RLS porque el cliente Supabase del backend usa el JWT del usuario." vertex="1">
+          <mxGeometry height="100" width="1300" x="60" y="860" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
